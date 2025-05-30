@@ -1,0 +1,66 @@
+@font-face {
+    font-family: 'Averia Libre';
+    src: url(/fonts/AveriaLibre-Regular.ttf) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Averia Libre';
+    src: url(/fonts/AveriaLibre-Bold.ttf) format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Averia Libre';
+    src: url(/fonts/AveriaLibre-Italic.ttf) format('truetype');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Averia Libre';
+    src: url(/fonts/AveriaLibre-Light.ttf) format('truetype');
+    font-weight: light;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Averia Libre';
+    src: url(/fonts/AveriaLibre-LightItalic.ttf) format('truetype');
+    font-weight: light;
+    font-style: italic;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Averia Libre';
+    src: url(/fonts/AveriaLibre-BoldItalic.ttf) format('truetype');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+h1, h2, h3, h4 {
+    font-family: 'Averia Libre', sans-serif;
+    font-weight: bold;
+    font-style: normal;
+}
+h1 {
+    font-size: 2.5rem;
+}
+h2 {
+    font-size: 2rem;
+}
+h3 {
+    font-size: 1.75rem;
+}
+h4 {
+    font-size: 1.5rem;
+}
+body, p, span, a, li, button {
+    font-family: 'Averia Libre', sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 1rem;
+    line-height: 1.5;
+}

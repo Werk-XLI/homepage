@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+@import "./averiaLibre.css";
+
+@theme {
+    --font-*: initial;
+    --font-sans: Averia Libre, sans-serif;
+}
