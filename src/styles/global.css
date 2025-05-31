@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @import "./averiaLibre.css";
+@import "@tabler/icons-webfont/dist/tabler-icons.css";
 
 @theme {
     --font-sans: Averia Libre, sans-serif;
