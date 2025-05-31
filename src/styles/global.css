@@ -3,6 +3,18 @@
 @import "./averiaLibre.css";
 
 @theme {
-    --font-*: initial;
     --font-sans: Averia Libre, sans-serif;
+}
+@layer base {
+    body {
+        @apply bg-neutral-100 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply font-sans;
+    }
+
+    p {
+        @apply font-sans;
+    }
 }
