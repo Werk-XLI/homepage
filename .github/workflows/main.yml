@@ -33,7 +33,7 @@ jobs:
 
       - name: Extract repo name
         id: repo
-        run: echo "REPO_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_OUTPUT
+        run: echo "REPO_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
 
       - name: Build and push multi-arch image
         uses: docker/build-push-action@v5
