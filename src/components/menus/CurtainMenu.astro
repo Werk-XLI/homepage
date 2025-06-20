@@ -2,57 +2,58 @@
 import Logo from "../logo/Logo.astro";
 ---
 
-<div x-data="{ open: false }" class="relative">
-    <div
-        class="flex flex-row justify-between items-center bg-gradient-to-b from-black/50 to-transparent p-4"
-    >
-        <button
-            onclick="window.location.href='/';"
-            class="justify-start items-center p-4"
-        >
-            <Logo width={"4rem"} />
+<div>
+  <nav class="font-black text-white text-shadow-outline text-3xl flex justify-between items-center p-2 bg-gradient-to-b dark:from-black from-white to-transparent">
+    <a href="/" class="p-4 w-[8rem] flex items-center"><Logo /></a>
+    <button id="menu-open" aria-label="Open menu" class="p-3 bg-black rounded-lg flex items-center">
+      <i class="ti ti-menu-2"></i>
+    </button>
+  </nav>
+  <div
+    id="curtain-menu"
+    class="fixed inset-0 flex justify-center items-center dark:bg-black/80 bg-white/80 text-3xl font-black text-white text-shadow-outline z-50 translate-x-full transition-transform duration-300"
+    role="dialog"
+    aria-modal="true"
+    tabindex="-1"
+    style="pointer-events:none"
+  >
+    <ul class="flex flex-col justify-center items-center space-y-8">
+      <li><a href="/#live" class="p-4 menu-link">Live</a></li>
+      <li><a href="/#music" class="p-4 menu-link">Musik</a></li>
+      <li><a href="/videos" class="p-4 menu-link">Videos</a></li>
+      <li><a href="/gallery" class="p-4 menu-link">Gallerie</a></li>
+      <li><a href="/shop" class="p-4 menu-link">Shop</a></li>
+      <li><a href="/contact" class="p-4 menu-link">Kontakt</a></li>
+      <li>
+        <button id="menu-close" class="p-3 bg-black rounded-lg" aria-label="Close menu">
+          <i class="ti ti-x"></i>
         </button>
-
-        <!-- Hamburger Button -->
-        <button
-            @click="open = true"
-            aria-label="Open menu"
-            class="justify-end items-center p-4"
-        >
-            <i class="ti ti-menu-2 text-2xl"></i>
-        </button>
-    </div>
-
-    <!-- Curtain Menu -->
-    <div
-        x-show="open"
-        x-transition:enter="transition-transform duration-300"
-        x-transition:enter-start="translate-x-full"
-        x-transition:enter-end="translate-x-0"
-        x-transition:leave="transition-transform duration-300"
-        x-transition:leave-start="translate-x-0"
-        x-transition:leave-end="translate-x-full"
-        class="fixed flex inset-0 justify-center items-center bg-black/80"
-        style="display: none;"
-    >
-        <div class="w-full h-full flex flex-col justify-center items-center p-4">
-            <nav class="flex flex-col text-2xl items-center">
-                <a href="/#live" @click="open = false" class="p-4">Live</a>
-                <a href="/#music" @click="open = false" class="p-4">Musik</a>
-                <a href="/videos" @click="open = false" class="p-4">Videos</a>
-                <a href="/gallery" @click="open = false" class="p-4">Gallerie</a>
-                <a href="/shop" @click="open = false" class="p-4">Shop</a>
-                <a href="/contact" @click="open = false" class="p-4">Kontakt</a>
-            </nav>
-            <!-- Close Button at the bottom -->
-            <button 
-                @click="open = false" 
-                class="p-4" 
-                aria-label="Close menu"
-            >
-                <i class="ti ti-x text-2xl"></i>
-            </button>
-        </div>
-        <div class="absolute inset-0" @click="open = false"></div>
-    </div>
+      </li>
+    </ul>
+  </div>
 </div>
+
+<script is:inline>
+window.addEventListener('DOMContentLoaded', () => {
+  const openBtn = document.getElementById('menu-open');
+  const closeBtn = document.getElementById('menu-close');
+  const menu = document.getElementById('curtain-menu');
+  const links = menu.querySelectorAll('.menu-link');
+  function openMenu() {
+    menu.classList.remove('translate-x-full');
+    menu.classList.add('translate-x-0');
+    menu.style.pointerEvents = 'auto';
+    menu.focus();
+  }
+  function closeMenu() {
+    menu.classList.add('translate-x-full');
+    menu.classList.remove('translate-x-0');
+    menu.style.pointerEvents = 'none';
+    openBtn.focus();
+  }
+  openBtn.addEventListener('click', openMenu);
+  closeBtn.addEventListener('click', closeMenu);
+  menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
+  links.forEach(link => link.addEventListener('click', closeMenu));
+});
+</script>

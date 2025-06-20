@@ -1,46 +1,25 @@
 ---
-import CurtainMenu from "../components/menus/CurtainMenu.astro";
 import Menu from "../components/menus/Menu.astro";
-import "./src/styles/global.css";
+import Footer from "../components/footer/DefaultFooter.astro";
+import "../styles/global.css";
 const { title = "Werk XLI" } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="de">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link
-			rel="icon"
-			type="image/svg+xml"
-			href="/favicon.svg"
-			media="(prefers-color-scheme: dark)"
-		/>
-		<link
-			rel="icon"
-			type="image/svg+xml"
-			href="/favicon_dark.svg"
-			media="(prefers-color-scheme: light)"
-		/>
-		<meta name="generator" content={Astro.generator} />
-		<script src="//unpkg.com/alpinejs" defer></script>
-		<title>{title}</title>
-	</head>
-	<body>
-		<div class="hidden lg:block fixed inset-x-0 top-0 z-50">
-			<Menu />
-		</div>
-		<div class="block lg:hidden">
-			<CurtainMenu />
-		</div>
-		<slot />
-		<footer class="fixed text-center inset-x-0 bottom-0 p-4 z-50">
-			<p>
-				&copy; {new Date().getFullYear()} Werk XLI. All rights reserved.
-			</p>
-			<p>
-				<a href="/impressum">Impressum</a> | <a href="/datenschutz">Datenschutz</a>
-			</p>
-		</footer>
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon_dark.svg" media="(prefers-color-scheme: light)" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <Menu />
+    <main class="flex-1 flex flex-col">
+      <slot />
+    </main>
+    <Footer />
+  </body>
 </html>
