@@ -74,4 +74,4 @@ npm run preview
 
 ---
 
-© {year} Werk XLI. All rights reserved.
+© 2025 Werk XLI. All rights reserved.
