@@ -1,48 +1,77 @@
-# Astro Starter Kit: Basics
+# Werk XLI Band Website
+
+This is the official website for Werk XLI, built with [Astro](https://astro.build/) and [Tailwind CSS](https://tailwindcss.com/).
+
+---
+
+## 🚀 Features
+
+- **Fast, static site** powered by Astro
+- **Responsive design** with mobile and desktop navigation
+- **Custom branding** with Averia Libre font and outlined text
+- **Accessible navigation** and semantic HTML
+- **Easy content editing** with Astro components and layouts
+
+---
+
+## 📁 Project Structure
+
+```
+/
+├── public/                # Static assets (favicon, images, etc.)
+├── src/
+│   ├── components/        # Reusable UI components (menus, logo, footer)
+│   ├── layouts/           # Page layouts (Base, Shop, etc.)
+│   ├── pages/             # Site pages (index, 404, 500, etc.)
+│   └── styles/            # Global and custom CSS
+├── tailwind.config.js     # Tailwind CSS configuration
+└── package.json           # Project metadata and scripts
+```
+
+---
+
+## 🧑‍💻 Development
+
+Install dependencies:
 
 ```sh
-npm create astro@latest -- --template basics
+npm install
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+Start the local dev server:
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
+```sh
+npm run dev
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+Build for production:
 
-## 🧞 Commands
+```sh
+npm run build
+```
 
-All commands are run from the root of the project, from a terminal:
+Preview the production build:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+```sh
+npm run preview
+```
 
-## 👀 Want to learn more?
+---
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## 🛠️ Customization
+
+- **Navigation:** Edit `src/components/menus/FullMenu.astro` and `CurtainMenu.astro`
+- **Footer:** Edit `src/components/footer/DefaultFooter.astro`
+- **Branding:** Update `src/styles/averiaLibre.css` and logo SVG in `src/components/logo/Logo.astro`
+- **Theme:** Customize Tailwind in `tailwind.config.js` and `src/styles/global.css`
+
+---
+
+## 📚 Learn More
+
+- [Astro Documentation](https://docs.astro.build)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+
+---
+
+© 2025 Werk XLI. All rights reserved.
