@@ -20,3 +20,9 @@
         font-size: var(--text-lg);
     }
 }
+
+@layer tabler-icons {
+    * {
+        font-display: swap;
+    }
+}
