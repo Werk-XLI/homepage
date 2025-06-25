@@ -4,7 +4,7 @@ import Logo from "../logo/Logo.astro";
 
 <div>
   <nav class="font-black text-white text-shadow-outline text-3xl flex justify-between items-center p-2 bg-gradient-to-b dark:from-black from-white to-transparent">
-    <a href="/" class="p-4 w-[8rem] flex items-center"><Logo /></a>
+    <a href="/" class="p-4 w-[8rem] flex items-center" aria-label="Zurück zur Homepage"><Logo /></a>
     <button id="menu-open" aria-label="Open menu" class="p-3 bg-black rounded-lg flex items-center">
       <i class="ti ti-menu-2"></i>
     </button>
@@ -14,6 +14,7 @@ import Logo from "../logo/Logo.astro";
     class="fixed inset-0 flex justify-center items-center dark:bg-black/80 bg-white/80 text-3xl font-black text-white text-shadow-outline z-50 translate-x-full transition-transform duration-300"
     role="dialog"
     aria-modal="true"
+    aria-label="Menu"
     tabindex="-1"
     style="pointer-events:none"
   >

@@ -5,6 +5,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 import node from '@astrojs/node';
 
+import compress from 'astro-compress';
+
 // https://astro.build/config
 export default defineConfig({
   vite: {
@@ -18,7 +20,7 @@ export default defineConfig({
 
   output: "server",
 
-  integrations: [],
+  integrations: [compress()],
 
   adapter: node({
     mode: 'standalone'
