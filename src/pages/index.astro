@@ -1,13 +1,18 @@
 ---
 import Base from '../layouts/Base.astro';
+
+import Banner from '../components/banner/Banner.astro';
+import Pressetsxt from '../content/markdown/pressetext.md';
 ---
 
 <Base title="Werk XLI">
   <!-- Content here -->
-   <div class="min-h-screen flex flex-col items-center justify-center">
-     <h1 class="text-4xl font-bold">Willkommen auf der Homepage von Werk XLI</h1>
-     <!-- You can add more components or content here -->
-     <br />
-      <p class="mt-4 text-lg">Die Seite befindet sich noch im Aufbau.</p>
+   <div class="flex flex-col">
+   <div class="flex justify-center items-center top-0 inset-x-0">
+      <Banner />
+   </div>
+   <div class="min-h-screen flex flex-col justify-center max-w-2/3 mx-auto">
+     <Pressetsxt />
+   </div>
    </div>
 </Base>
