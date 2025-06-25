@@ -1,22 +1,22 @@
-@import "tailwindcss";
+@layer theme, base, components, utilities, font, tabler-icons;
+@import "./theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "./averiaLibre.css" layer(font);
+@import "@tabler/icons-webfont/dist/tabler-icons.css" layer(tabler-icons);
 
-@import "./averiaLibre.css";
-@import "@tabler/icons-webfont/dist/tabler-icons.css";
-
-@theme {
-    --font-sans: Averia Libre, sans-serif;
-    --text-shadow-outline: 2px 0px 0px black, -2px 0px 0px black, 0px 2px 0px black, 0px -2px 0px black, 1px 1px 0px black, -1px -1px 0px black, 1px -1px 0px black, -1px 1px 0px black;
-}
 @layer base {
     body {
         @apply bg-neutral-100 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100;
+        @apply font-averia-libre;
     }
-
-    h1, h2, h3, h4, h5, h6 {
-        @apply font-sans;
+    h1 {
+        font-size: var(--text-2xl);
     }
-
-    p {
-        @apply font-sans;
+    h2 {
+        font-size: var(--text-xl);
+    }
+    h3 {
+        font-size: var(--text-lg);
     }
 }
