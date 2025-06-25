@@ -11,13 +11,17 @@
         @apply font-averia-libre;
     }
     h1 {
-        font-size: var(--text-2xl);
+        font-size: var(--text-4xl);
     }
     h2 {
-        font-size: var(--text-xl);
+        font-size: var(--text-3xl);
     }
     h3 {
-        font-size: var(--text-lg);
+        font-size: var(--text-2xl);
+    }
+    p {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
     }
 }
 

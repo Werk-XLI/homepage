@@ -1,0 +1,106 @@
+---
+import Band from '../../../public/images/banners/banner_band.jpg';
+import Eric from '../../../public/images/banners/banner_eric.jpg';
+import BenjiFabian from '../../../public/images/banners/banner_fabi_benji.jpg';
+import Georg from '../../../public/images/banners/banner_georg.jpg';
+
+const images = [
+  { src: Band, alt: 'Band members', width: 1200, height: 800 },
+  { src: Eric, alt: 'Eric - Bass', width: 1200, height: 800 },
+  { src: BenjiFabian , alt: 'Benji and Fabian - Keys and Lead Guitar/Vocals', width: 1200, height: 800 },
+  { src: Georg, alt: 'Georg - Drums', width: 1200, height: 800 }
+];
+---
+
+<div class="w-full aspect-[16/9] overflow-hidden" id="banner-slider" role="region" aria-label="Image carousel">
+  {images.map(({ src, alt, width, height }, i) => (
+    <img
+      src={src.src}
+      alt={alt}
+      width={width}
+      height={height}
+      class={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out opacity-0 ${i === 0 ? "opacity-100" : ""}`}
+      data-slide={i}
+      loading={i === 0 ? "eager" : "lazy"}
+      decoding={i === 0 ? "sync" : "async"}
+    />
+  ))}
+</div>
+<script>
+  let currentIndex = 0;
+  let slides: NodeListOf<HTMLElement>;
+  let intervalId: ReturnType<typeof setInterval> | null = null;
+  
+  const SLIDE_DURATION = 16000;
+
+  function updateSlide(newIndex: number) {
+    // Remove active class from current slide
+    slides[currentIndex]?.classList.remove("opacity-100");
+    
+    // Update index
+    currentIndex = newIndex;
+    
+    // Add active class to new slide
+    slides[currentIndex]?.classList.add("opacity-100");
+  }
+
+  function startSlideshow() {
+    if (intervalId) clearInterval(intervalId);
+    
+    intervalId = setInterval(() => {
+      const nextIndex = (currentIndex + 1) % slides.length;
+      updateSlide(nextIndex);
+    }, SLIDE_DURATION);
+  }
+
+  function stopSlideshow() {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+  }
+
+  // Initialize on DOM load
+  window.addEventListener("DOMContentLoaded", () => {
+    const container = document.getElementById("banner-slider");
+    if (!container) return;
+
+    slides = container.querySelectorAll("[data-slide]");
+    
+    if (!slides.length) return;
+
+    // Preload next image
+    const preloadNext = () => {
+      const nextIndex = (currentIndex + 1) % slides.length;
+      const nextImg = slides[nextIndex] as HTMLImageElement;
+      if (nextImg && !nextImg.complete) {
+        const img = new Image();
+        img.src = nextImg.src;
+      }
+    };
+
+    // Start the slideshow and preload
+    startSlideshow();
+    preloadNext();
+    
+    // Preload next image when slide changes
+    const observer = new MutationObserver(() => preloadNext());
+    observer.observe(container, { 
+      attributes: true, 
+      attributeFilter: ['class'],
+      subtree: true 
+    });
+  });
+
+  // Cleanup on page unload
+  window.addEventListener("beforeunload", stopSlideshow);
+
+  // Pause when tab is not visible
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      stopSlideshow();
+    } else {
+      startSlideshow();
+    }
+  });
+</script>
