@@ -3,34 +3,32 @@ import Logo from "../logo/Logo.astro";
 ---
 
 <div>
-  <nav class="font-black text-white text-shadow-outline text-3xl flex justify-between items-center p-2 bg-gradient-to-b dark:from-black from-white to-transparent">
-    <a href="/" class="p-4 w-[8rem] flex items-center" aria-label="Zurück zur Homepage"><Logo /></a>
-    <button id="menu-open" aria-label="Open menu" class="p-3 bg-black rounded-lg flex items-center">
+  <nav class="font-black text-white text-shadow-outline text-2xl sm:text-3xl flex justify-between items-center p-2 bg-gradient-to-b dark:from-black from-white to-transparent">
+    <a href="/" class="p-3 w-[6rem] sm:w-[8rem] flex items-center" aria-label="Zurück zur Homepage"><Logo /></a>
+    <button id="menu-open" aria-label="Open menu" class="p-4 bg-black rounded-lg text-xl">
       <i class="ti ti-menu-2"></i>
     </button>
   </nav>
   <div
     id="curtain-menu"
-    class="fixed inset-0 flex justify-center items-center dark:bg-black/80 bg-white/80 text-3xl font-black text-white text-shadow-outline z-50 translate-x-full transition-transform duration-300"
+    class="fixed inset-0 flex flex-col justify-center items-center dark:bg-black/90 bg-white/90 text-2xl sm:text-3xl font-black text-white text-shadow-outline z-50 translate-x-full transition-transform duration-300 p-4"
     role="dialog"
     aria-modal="true"
     aria-label="Menu"
     tabindex="-1"
     style="pointer-events:none"
   >
-    <ul class="flex flex-col justify-center items-center space-y-8">
-      <li><a href="/#live" class="p-4 menu-link">Live</a></li>
-      <li><a href="/#music" class="p-4 menu-link">Musik</a></li>
-      <li><a href="/videos" class="p-4 menu-link">Videos</a></li>
-      <li><a href="/gallery" class="p-4 menu-link">Gallerie</a></li>
-      <li><a href="/shop" class="p-4 menu-link">Shop</a></li>
-      <li><a href="/contact" class="p-4 menu-link">Kontakt</a></li>
-      <li>
-        <button id="menu-close" class="p-3 bg-black rounded-lg" aria-label="Close menu">
-          <i class="ti ti-x"></i>
-        </button>
-      </li>
-    </ul>
+    <div class="grid grid-cols-1 landscape:grid-cols-2 gap-6 flex-1 content-center w-full max-w-sm">
+      <a href="/#live" class="p-4 menu-link min-h-[3rem] flex items-center justify-center">Live</a>
+      <a href="/#music" class="p-4 menu-link min-h-[3rem] flex items-center justify-center">Musik</a>
+      <a href="/videos" class="p-4 menu-link min-h-[3rem] flex items-center justify-center">Videos</a>
+      <a href="/gallery" class="p-4 menu-link min-h-[3rem] flex items-center justify-center">Gallerie</a>
+      <a href="/shop" class="p-4 menu-link min-h-[3rem] flex items-center justify-center">Shop</a>
+      <a href="/contact" class="p-4 menu-link min-h-[3rem] flex items-center justify-center">Kontakt</a>
+    </div>
+    <button id="menu-close" class="p-4 bg-black rounded-xl text-xl min-h-[3rem] min-w-[3rem] flex items-center justify-center mt-6" aria-label="Close menu">
+      <i class="ti ti-x"></i>
+    </button>
   </div>
 </div>
 
@@ -40,18 +38,19 @@ window.addEventListener('DOMContentLoaded', () => {
   const closeBtn = document.getElementById('menu-close');
   const menu = document.getElementById('curtain-menu');
   const links = menu.querySelectorAll('.menu-link');
+  
   function openMenu() {
     menu.classList.remove('translate-x-full');
-    menu.classList.add('translate-x-0');
     menu.style.pointerEvents = 'auto';
     menu.focus();
   }
+  
   function closeMenu() {
     menu.classList.add('translate-x-full');
-    menu.classList.remove('translate-x-0');
     menu.style.pointerEvents = 'none';
     openBtn.focus();
   }
+  
   openBtn.addEventListener('click', openMenu);
   closeBtn.addEventListener('click', closeMenu);
   menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
