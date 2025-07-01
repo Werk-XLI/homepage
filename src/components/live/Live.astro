@@ -1,32 +1,46 @@
 ---
 // Load and parse markdown files
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 const posts = await getCollection('liveDates');
-// Filter and sort posts
-const liveDates = posts
-    .filter((post: CollectionEntry<'liveDates'>) => post.data.date)
-    .sort((a: CollectionEntry<'liveDates'>, b: CollectionEntry<'liveDates'>) => new Date(a.data.date).getTime() - new Date(b.data.date).getTime());
+
+const renderedPosts = await Promise.all(
+    posts.map(async (post) => {
+        const { Content } = await post.render();
+        return {
+            ...post,
+            Content
+        };
+    })
+);
+
 // Separate upcoming and past dates
 const today = new Date();
-const upcomingDates = liveDates.filter((post: CollectionEntry<'liveDates'>) => new Date(post.data.date) >= today);
-const pastDates = liveDates.filter((post: CollectionEntry<'liveDates'>) => new Date(post.data.date) < today);
+const upcomingDates = renderedPosts
+    .filter((post) => post.data.date >= today)
+    .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+const pastDates = renderedPosts
+    .filter((post) => post.data.date < today)
+    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
-<section class="flex self-auto flex-col max-w-2/3 mx-auto mt-12 mb-12">
+<section class="flex self-auto flex-col max-w-2/3 mx-auto mt-16 mb-16">
     <!-- Upcoming Dates -->
     {
         upcomingDates.length > 0 && (
-            <div class="mb-16">
-                <h2 class="text-4xl mb-8">Kommende Konzerte:</h2>
+            <div class="mb-8">
                 <div class="flex flex-col gap-8">
-                    {upcomingDates.map((show: CollectionEntry<'liveDates'>) => (
+                    {upcomingDates.map((show) => (
                         <article class="bg-neutral-50 dark:bg-neutral-800 rounded-xl shadow-lg p-8 border border-neutral-200 dark:border-neutral-700">
                             <h3 class="mb-4">{show.data.title}</h3>
                             <div class="flex flex-col lg:flex-row gap-4 mb-4">
                                 {show.data.date && (
                                     <div class="flex items-center text-neutral-600 dark:text-neutral-300">
                                         <i class="ti ti-calendar-filled mr-1"></i>
-                                        {show.data.date}
+                                        {show.data.date.toLocaleDateString('de-DE', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}
                                     </div>
                                 )}
                                 {show.data.time && (
@@ -54,9 +68,9 @@ const pastDates = liveDates.filter((post: CollectionEntry<'liveDates'>) => new D
                                     </div>
                                 )}
                             </div>
-                            {show.body && (
+                            {show.Content && (
                                 <div class="flex flex-col text-neutral-600 dark:text-neutral-300">
-                                    {show.body}
+                                    <show.Content />
                                 </div> 
                             )}
                         </article>
@@ -76,7 +90,7 @@ const pastDates = liveDates.filter((post: CollectionEntry<'liveDates'>) => new D
                         class="bg-neutral-600 text-neutral-100 px-8 py-4 rounded-xl transition-all duration-200 font-semibold shadow-lg"
                     >
                         <span id="toggleText">Vergangene Konzerte</span>
-                        <i class="ti ti-chevron-compact-down"></i>
+                        <i id="toggleIcon" class="ti ti-chevron-compact-down"></i>
                     </button>
                 </div>
 
@@ -84,15 +98,19 @@ const pastDates = liveDates.filter((post: CollectionEntry<'liveDates'>) => new D
                     id="pastDatesContainer"
                     class="hidden opacity-0 translate-y-4 transition-all duration-300"
                 >
-                    <div class="flex flex-col gap-8">
-                        {pastDates.map((show: CollectionEntry<'liveDates'>) => (
+                    <div class="flex flex-col gap-8 opacity-40">
+                        {pastDates.map((show) => (
                             <article class="bg-neutral-50 dark:bg-neutral-800 rounded-xl shadow-lg p-8 border border-neutral-200 dark:border-neutral-700">
                             <h3 class="mb-4">{show.data.title}</h3>
                             <div class="flex flex-col lg:flex-row gap-4 mb-4">
                                 {show.data.date && (
                                     <div class="flex items-center text-neutral-600 dark:text-neutral-300">
                                         <i class="ti ti-calendar-filled mr-1"></i>
-                                        {show.data.date}
+                                        {show.data.date.toLocaleDateString('de-DE', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}
                                     </div>
                                 )}
                                 {show.data.time && (
@@ -120,11 +138,10 @@ const pastDates = liveDates.filter((post: CollectionEntry<'liveDates'>) => new D
                                     </div>
                                 )}
                             </div>
-                            {show.body && (
-                                <div
-                                    class="flex flex-col text-neutral-600 dark:text-neutral-300"
-                                    set:html={show.body}
-                                />
+                            {show.Content && (
+                                <div class="flex flex-col text-neutral-600 dark:text-neutral-300">
+                                    <show.Content />
+                                </div> 
                             )}
                         </article>
                         ))}
@@ -136,12 +153,12 @@ const pastDates = liveDates.filter((post: CollectionEntry<'liveDates'>) => new D
 
     <!-- No dates message -->
     {
-        liveDates.length === 0 && (
+        posts.length === 0 && (
             <div class="text-center py-16">
-                <h2 class="text-3xl mb-6 text-neutral-600 dark:text-neutral-400">
-                    No shows scheduled
+                <h2 class="mb-6">
+                    Aktuell keine Konzerte geplant
                 </h2>
-                <p class="text-xl text-neutral-500">Check back soon!</p>
+                <p class="text-xl">Komm bald wieder für mehr!</p>
             </div>
         )
     }
@@ -152,8 +169,9 @@ const pastDates = liveDates.filter((post: CollectionEntry<'liveDates'>) => new D
         .getElementById("togglePastDates")
         ?.addEventListener("click", () => {
             const container = document.getElementById("pastDatesContainer");
+            const toggleIcon = document.getElementById("toggleIcon");
 
-            if (!container) return;
+            if (!container || !toggleIcon) return;
 
             const isHidden = container.classList.contains("hidden");
 
@@ -162,11 +180,15 @@ const pastDates = liveDates.filter((post: CollectionEntry<'liveDates'>) => new D
                 container.offsetHeight; // Force reflow
                 container.classList.remove("opacity-0", "translate-y-4");
                 container.classList.add("opacity-100", "translate-y-0");
+                toggleIcon.classList.remove("ti-chevron-compact-down");
+                toggleIcon.classList.add("ti-chevron-compact-up");
                 
             } else {
                 container.classList.remove("opacity-100", "translate-y-0");
                 container.classList.add("opacity-0", "translate-y-4");
                 setTimeout(() => container.classList.add("hidden"), 300);
+                toggleIcon.classList.remove("ti-chevron-compact-up");
+                toggleIcon.classList.add("ti-chevron-compact-down");
             }
         });
 </script>

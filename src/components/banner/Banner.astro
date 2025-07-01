@@ -20,7 +20,7 @@ const images = [
       alt={alt}
       class={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out opacity-0 ${i === 0 ? "opacity-100" : ""}`}
       data-slide={i}
-      loading={i === 0 ? "eager" : "lazy"}
+      loading="eager"
       decoding={i === 0 ? "sync" : "async"}
     />
   ))}
