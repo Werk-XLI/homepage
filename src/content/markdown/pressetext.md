@@ -1,8 +1,7 @@
 ---
+title: "Pressetext"
 
 ---
-
-# Wir:
 
 Eine Prise Selbstironie trifft auf eine gesunde Menge Gesellschaftskritik.
 

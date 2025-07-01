@@ -1,4 +1,194 @@
 ---
+// Load and parse markdown files
+import { getCollection, render } from 'astro:content';
+const posts = await getCollection('liveDates');
 
+const renderedPosts = await Promise.all(
+    posts.map(async (post) => {
+        const { Content } = await post.render();
+        return {
+            ...post,
+            Content
+        };
+    })
+);
+
+// Separate upcoming and past dates
+const today = new Date();
+const upcomingDates = renderedPosts
+    .filter((post) => post.data.date >= today)
+    .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+const pastDates = renderedPosts
+    .filter((post) => post.data.date < today)
+    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
+<section class="flex self-auto flex-col max-w-2/3 mx-auto mt-16 mb-16">
+    <!-- Upcoming Dates -->
+    {
+        upcomingDates.length > 0 && (
+            <div class="mb-8">
+                <div class="flex flex-col gap-8">
+                    {upcomingDates.map((show) => (
+                        <article class="bg-neutral-50 dark:bg-neutral-800 rounded-xl shadow-lg p-8 border border-neutral-200 dark:border-neutral-700">
+                            <h3 class="mb-4">{show.data.title}</h3>
+                            <div class="flex flex-col lg:flex-row gap-4 mb-4">
+                                {show.data.date && (
+                                    <div class="flex items-center text-neutral-600 dark:text-neutral-300">
+                                        <i class="ti ti-calendar-filled mr-1"></i>
+                                        {show.data.date.toLocaleDateString('de-DE', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}
+                                    </div>
+                                )}
+                                {show.data.time && (
+                                    <div class="flex items-center text-neutral-600 dark:text-neutral-300">
+                                        <i class="ti ti-clock-filled mr-1"></i>
+                                        {show.data.time}
+                                    </div>
+                                )}
+                                {show.data.venue && (
+                                    <div class="flex items-center text-neutral-600 dark:text-neutral-300">
+                                        <i class="ti ti-map-pin-filled mr-1"></i>
+                                        {show.data.venue}
+                                    </div>
+                                )}
+                                {show.data.city && (
+                                    <div class="flex items-center text-neutral-600 dark:text-neutral-300">
+                                        <i class="ti ti-building mr-1"></i>
+                                        {show.data.city}
+                                    </div>
+                                )}
+                                {show.data.price && (
+                                    <div class="flex items-center text-neutral-600 dark:text-neutral-300">
+                                        <i class="ti ti-ticket mr-1"></i>
+                                        {show.data.price}
+                                    </div>
+                                )}
+                            </div>
+                            {show.Content && (
+                                <div class="flex flex-col text-neutral-600 dark:text-neutral-300">
+                                    <show.Content />
+                                </div> 
+                            )}
+                        </article>
+                    ))}
+                </div>
+            </div>
+        )
+    }
+
+    <!-- Past Dates -->
+    {
+        pastDates.length > 0 && (
+            <div>
+                <div class="text-center mb-8">
+                    <button
+                        id="togglePastDates"
+                        class="bg-neutral-600 text-neutral-100 px-8 py-4 rounded-xl transition-all duration-200 font-semibold shadow-lg"
+                    >
+                        <span id="toggleText">Vergangene Konzerte</span>
+                        <i id="toggleIcon" class="ti ti-chevron-compact-down"></i>
+                    </button>
+                </div>
+
+                <div
+                    id="pastDatesContainer"
+                    class="hidden opacity-0 translate-y-4 transition-all duration-300"
+                >
+                    <div class="flex flex-col gap-8 opacity-40">
+                        {pastDates.map((show) => (
+                            <article class="bg-neutral-50 dark:bg-neutral-800 rounded-xl shadow-lg p-8 border border-neutral-200 dark:border-neutral-700">
+                            <h3 class="mb-4">{show.data.title}</h3>
+                            <div class="flex flex-col lg:flex-row gap-4 mb-4">
+                                {show.data.date && (
+                                    <div class="flex items-center text-neutral-600 dark:text-neutral-300">
+                                        <i class="ti ti-calendar-filled mr-1"></i>
+                                        {show.data.date.toLocaleDateString('de-DE', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}
+                                    </div>
+                                )}
+                                {show.data.time && (
+                                    <div class="flex items-center text-neutral-600 dark:text-neutral-300">
+                                        <i class="ti ti-clock-filled mr-1"></i>
+                                        {show.data.time}
+                                    </div>
+                                )}
+                                {show.data.venue && (
+                                    <div class="flex items-center text-neutral-600 dark:text-neutral-300">
+                                        <i class="ti ti-map-pin-filled mr-1"></i>
+                                        {show.data.venue}
+                                    </div>
+                                )}
+                                {show.data.city && (
+                                    <div class="flex items-center text-neutral-600 dark:text-neutral-300">
+                                        <i class="ti ti-building mr-1"></i>
+                                        {show.data.city}
+                                    </div>
+                                )}
+                                {show.data.price && (
+                                    <div class="flex items-center text-neutral-600 dark:text-neutral-300">
+                                        <i class="ti ti-ticket mr-1"></i>
+                                        {show.data.price}
+                                    </div>
+                                )}
+                            </div>
+                            {show.Content && (
+                                <div class="flex flex-col text-neutral-600 dark:text-neutral-300">
+                                    <show.Content />
+                                </div> 
+                            )}
+                        </article>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    <!-- No dates message -->
+    {
+        posts.length === 0 && (
+            <div class="text-center py-16">
+                <h2 class="mb-6">
+                    Aktuell keine Konzerte geplant
+                </h2>
+                <p class="text-xl">Komm bald wieder für mehr!</p>
+            </div>
+        )
+    }
+</section>
+
+<script>
+    document
+        .getElementById("togglePastDates")
+        ?.addEventListener("click", () => {
+            const container = document.getElementById("pastDatesContainer");
+            const toggleIcon = document.getElementById("toggleIcon");
+
+            if (!container || !toggleIcon) return;
+
+            const isHidden = container.classList.contains("hidden");
+
+            if (isHidden) {
+                container.classList.remove("hidden");
+                container.offsetHeight; // Force reflow
+                container.classList.remove("opacity-0", "translate-y-4");
+                container.classList.add("opacity-100", "translate-y-0");
+                toggleIcon.classList.remove("ti-chevron-compact-down");
+                toggleIcon.classList.add("ti-chevron-compact-up");
+                
+            } else {
+                container.classList.remove("opacity-100", "translate-y-0");
+                container.classList.add("opacity-0", "translate-y-4");
+                setTimeout(() => container.classList.add("hidden"), 300);
+                toggleIcon.classList.remove("ti-chevron-compact-up");
+                toggleIcon.classList.add("ti-chevron-compact-down");
+            }
+        });
+</script>

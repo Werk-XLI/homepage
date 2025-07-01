@@ -2,7 +2,8 @@
 import Base from '../layouts/Base.astro';
 
 import Banner from '../components/banner/Banner.astro';
-import Pressetsxt from '../content/markdown/pressetext.md';
+import Pressetext from '../content/markdown/pressetext.md';
+import Live from '../components/live/Live.astro';
 ---
 
 <Base title="Werk XLI">
@@ -11,6 +12,9 @@ import Pressetsxt from '../content/markdown/pressetext.md';
       <Banner />
    </div>
    <div class="flex self-auto flex-col max-w-2/3 mx-auto mt-12 mb-12">
-     <Pressetsxt />
+      <Pressetext />
+   </div>
+   <div id="live">
+      <Live />
    </div>
 </Base>
