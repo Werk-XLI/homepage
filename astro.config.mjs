@@ -7,8 +7,6 @@ import node from '@astrojs/node';
 
 import compress from 'astro-compress';
 
-const isDev = process.env.NODE_ENV === 'development';
-
 // https://astro.build/config
 export default defineConfig({
   vite: {
@@ -21,13 +19,6 @@ export default defineConfig({
   },
 
   output: "server",
-
-  // Use ARM-compatible image service for dev server
-  image: isDev ? {
-    service: {
-      entrypoint: 'astro/assets/services/noop'
-    }
-  } : undefined,
 
   integrations: [compress()],
 

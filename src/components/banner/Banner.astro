@@ -1,51 +1,68 @@
 ---
-import { Image } from 'astro:assets';
-import Band from './images/banner_band.webp';
-import Eric from './images/banner_eric.webp';
-import BenjiFabian from './images/banner_fabi_benji.webp';
-import Georg from './images/banner_georg.webp';
+import { Image } from "astro:assets";
+import Band from "./images/banner_band.webp";
+import Eric from "./images/banner_eric.webp";
+import BenjiFabian from "./images/banner_fabi_benji.webp";
+import Georg from "./images/banner_georg.webp";
 
 const images = [
-  { src: Band, alt: 'Band members' },
-  { src: Eric, alt: 'Eric - Bass' },
-  { src: BenjiFabian, alt: 'Benji and Fabian - Keys and Lead Guitar/Vocals' },
-  { src: Georg, alt: 'Georg - Drums' }
+  { src: Band, alt: "Band members" },
+  { src: Eric, alt: "Eric - Bass" },
+  { src: BenjiFabian, alt: "Benji and Fabian - Keys and Lead Guitar/Vocals" },
+  { src: Georg, alt: "Georg - Drums" },
 ];
 ---
 
-<div class="w-full h-screen" id="banner-slider" role="region" aria-label="Image carousel">
-  {images.map(({ src, alt }, i) => (
-    <Image
-      src={src}
-      alt={alt}
-      class={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out opacity-0 ${i === 0 ? "opacity-100" : ""}`}
-      data-slide={i}
-      loading="eager"
-      decoding={i === 0 ? "sync" : "async"}
-    />
-  ))}
+<div
+  id="banner-slider"
+  class="grid w-full max-h-screen"
+  role="region"
+  aria-label="Image carousel"
+>
+  {
+    images.map(({ src, alt }, i) => (
+      <Image
+        src={src}
+        alt={alt}
+        class={`col-start-1 row-start-1 w-full max-h-screen object-cover transition-opacity duration-1000 ease-in-out opacity-0 ${i === 0 ? "opacity-100" : ""}`}
+        style={`z-index: ${i === 0 ? 2 : 1}`}
+        data-slide={i}
+        loading="eager"
+        decoding={i === 0 ? "sync" : "async"}
+      />
+    ))
+  }
 </div>
+
 <script>
   let currentIndex = 0;
   let slides: NodeListOf<HTMLElement>;
   let intervalId: ReturnType<typeof setInterval> | null = null;
-  
+
   const SLIDE_DURATION = 16000;
 
   function updateSlide(newIndex: number) {
-    // Remove active class from current slide
-    slides[currentIndex]?.classList.remove("opacity-100");
-    
-    // Update index
+    const currentSlide = slides[currentIndex];
+    const nextSlide = slides[newIndex];
+
+    if (!currentSlide || !nextSlide) return;
+
+    // Start next slide transition
+    nextSlide.style.zIndex = "2";
+    nextSlide.classList.add("opacity-100");
+
+    // Fade out current slide
+    setTimeout(() => {
+      currentSlide.classList.remove("opacity-100");
+      currentSlide.style.zIndex = "1";
+    }, 50);
+
     currentIndex = newIndex;
-    
-    // Add active class to new slide
-    slides[currentIndex]?.classList.add("opacity-100");
   }
 
   function startSlideshow() {
     if (intervalId) clearInterval(intervalId);
-    
+
     intervalId = setInterval(() => {
       const nextIndex = (currentIndex + 1) % slides.length;
       updateSlide(nextIndex);
@@ -65,41 +82,18 @@ const images = [
     if (!container) return;
 
     slides = container.querySelectorAll("[data-slide]");
-    
+
     if (!slides.length) return;
 
-    // Preload next image
-    const preloadNext = () => {
-      const nextIndex = (currentIndex + 1) % slides.length;
-      const nextImg = slides[nextIndex] as HTMLImageElement;
-      if (nextImg && !nextImg.complete) {
-        const img = new Image();
-        img.src = nextImg.src;
-      }
-    };
+    // Initialize z-index for slidesAdd commentMore actions
+    slides.forEach((slide, i) => {
+      slide.style.zIndex = i === 0 ? "2" : "1";
+    });
 
     // Start the slideshow and preload
     startSlideshow();
-    preloadNext();
-    
-    // Preload next image when slide changes
-    const observer = new MutationObserver(() => preloadNext());
-    observer.observe(container, { 
-      attributes: true, 
-      attributeFilter: ['class'],
-      subtree: true 
-    });
   });
 
   // Cleanup on page unload
   window.addEventListener("beforeunload", stopSlideshow);
-
-  // Pause when tab is not visible
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      stopSlideshow();
-    } else {
-      startSlideshow();
-    }
-  });
 </script>
