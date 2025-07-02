@@ -3,9 +3,19 @@ import Logo from "../logo/Logo.astro";
 ---
 
 <div>
-  <nav class="font-black text-white text-shadow-outline text-2xl sm:text-3xl flex justify-between items-center p-2 bg-gradient-to-b dark:from-black from-white to-transparent">
-    <a href="/" class="p-3 w-[6rem] sm:w-[8rem] flex items-center" aria-label="Zurück zur Homepage"><Logo /></a>
-    <button id="menu-open" aria-label="Open menu" class="p-4 bg-black rounded-lg text-xl">
+  <nav
+    class="font-black text-white text-shadow-outline text-2xl sm:text-3xl flex justify-between items-center p-2 bg-gradient-to-b dark:from-black from-white to-transparent"
+  >
+    <a
+      href="/"
+      class="p-3 w-[6rem] sm:w-[8rem] flex items-center"
+      aria-label="Zurück zur Homepage"><Logo /></a
+    >
+    <button
+      id="menu-open"
+      aria-label="Open menu"
+      class="p-4 bg-black rounded-lg text-xl"
+    >
       <i class="ti ti-menu-2"></i>
     </button>
   </nav>
@@ -18,42 +28,74 @@ import Logo from "../logo/Logo.astro";
     tabindex="-1"
     style="pointer-events:none"
   >
-    <div class="grid grid-cols-1 landscape:grid-cols-2 gap-6 flex-1 content-center w-full max-w-sm">
-      <a href="/#live" class="p-4 menu-link min-h-[3rem] flex items-center justify-center">Live</a>
-      <a href="/#music" class="p-4 menu-link min-h-[3rem] flex items-center justify-center">Musik</a>
-      <a href="/videos" class="p-4 menu-link min-h-[3rem] flex items-center justify-center">Videos</a>
-      <a href="/gallery" class="p-4 menu-link min-h-[3rem] flex items-center justify-center">Galerie</a>
-      <a href="/shop" class="p-4 menu-link min-h-[3rem] flex items-center justify-center">Shop</a>
-      <a href="/contact" class="p-4 menu-link min-h-[3rem] flex items-center justify-center">Kontakt</a>
+    <div
+      class="grid grid-cols-1 landscape:grid-cols-2 gap-6 flex-1 content-center w-full max-w-sm"
+    >
+      <a
+        href="/#live"
+        class="p-4 menu-link min-h-[3rem] flex items-center justify-center"
+        >Live</a
+      >
+      <a
+        href="/#music"
+        class="p-4 menu-link min-h-[3rem] flex items-center justify-center"
+        >Musik</a
+      >
+      <a
+        href="/videos"
+        class="p-4 menu-link min-h-[3rem] flex items-center justify-center"
+        >Videos</a
+      >
+      <a
+        href="/gallery"
+        class="p-4 menu-link min-h-[3rem] flex items-center justify-center"
+        >Galerie</a
+      >
+      <a
+        href="/shop"
+        class="p-4 menu-link min-h-[3rem] flex items-center justify-center"
+        >Shop</a
+      >
+      <a
+        href="/contact"
+        class="p-4 menu-link min-h-[3rem] flex items-center justify-center"
+        >Kontakt</a
+      >
     </div>
-    <button id="menu-close" class="p-4 bg-black rounded-xl text-xl min-h-[3rem] min-w-[3rem] flex items-center justify-center mt-6" aria-label="Close menu">
+    <button
+      id="menu-close"
+      class="p-4 bg-black rounded-xl text-xl min-h-[3rem] min-w-[3rem] flex items-center justify-center mt-6"
+      aria-label="Close menu"
+    >
       <i class="ti ti-x"></i>
     </button>
   </div>
 </div>
 
 <script is:inline>
-window.addEventListener('DOMContentLoaded', () => {
-  const openBtn = document.getElementById('menu-open');
-  const closeBtn = document.getElementById('menu-close');
-  const menu = document.getElementById('curtain-menu');
-  const links = menu.querySelectorAll('.menu-link');
-  
-  function openMenu() {
-    menu.classList.remove('translate-x-full');
-    menu.style.pointerEvents = 'auto';
-    menu.focus();
-  }
-  
-  function closeMenu() {
-    menu.classList.add('translate-x-full');
-    menu.style.pointerEvents = 'none';
-    openBtn.focus();
-  }
-  
-  openBtn.addEventListener('click', openMenu);
-  closeBtn.addEventListener('click', closeMenu);
-  menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
-  links.forEach(link => link.addEventListener('click', closeMenu));
-});
+  window.addEventListener("DOMContentLoaded", () => {
+    const openBtn = document.getElementById("menu-open");
+    const closeBtn = document.getElementById("menu-close");
+    const menu = document.getElementById("curtain-menu");
+    const links = menu.querySelectorAll(".menu-link");
+
+    function openMenu() {
+      menu.classList.remove("translate-x-full");
+      menu.style.pointerEvents = "auto";
+      menu.focus();
+    }
+
+    function closeMenu() {
+      menu.classList.add("translate-x-full");
+      menu.style.pointerEvents = "none";
+      openBtn.focus();
+    }
+
+    openBtn.addEventListener("click", openMenu);
+    closeBtn.addEventListener("click", closeMenu);
+    menu.addEventListener("click", (e) => {
+      if (e.target === menu) closeMenu();
+    });
+    links.forEach((link) => link.addEventListener("click", closeMenu));
+  });
 </script>
