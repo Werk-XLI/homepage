@@ -28,6 +28,7 @@ const images = [
         style={`z-index: ${i === 0 ? 2 : 1}`}
         data-slide={i}
         loading="eager"
+        fetchpriority="high"
         decoding={i === 0 ? "sync" : "async"}
       />
     ))

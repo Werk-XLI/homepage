@@ -1,3 +1,210 @@
 ---
+// SpotifyPlayer.astro - DSGVO-konforme Spotify-Komponente mit Support für verschiedene Inhaltstypen
+export interface Props {
+    spotifyId: string;
+    type?: "track" | "artist" | "album" | "playlist" | "show" | "episode";
+    title?: string;
+    subtitle?: string;
+    size?: "compact" | "normal";
+}
 
+const {
+    spotifyId,
+    type = "track",
+    title = "Spotify Inhalt",
+    subtitle = "",
+    size = "normal",
+} = Astro.props;
+
+// Höhe basierend auf Typ und Größe
+const heights = {
+    track: { compact: "152", normal: "152" },
+    artist: { compact: "352", normal: "732" },
+    album: { compact: "352", normal: "352" },
+    playlist: { compact: "352", normal: "352" },
+    show: { compact: "232", normal: "232" },
+    episode: { compact: "232", normal: "232" },
+};
+
+const height = heights[type][size];
+
+// Icon für verschiedene Typen
+const typeLabels = {
+    track: "Song",
+    artist: "Künstler",
+    album: "Album",
+    playlist: "Playlist",
+    show: "Podcast",
+    episode: "Podcast-Folge",
+};
 ---
+
+<div
+    class="spotify-consent-wrapper flex self-auto flex-col max-w-2/3 mx-auto mt-16 mb-16"
+    data-spotify-id={spotifyId}
+    data-spotify-type={type}
+    title={`Spotify ${typeLabels[type]}: ${title}`}
+>
+    <h2 class="mb-8">Musik</h2>
+    <!-- Placeholder vor Consent -->
+    <div
+        class="spotify-placeholder bg-neutral-800 border border-neutral-700 rounded-xl p-6 text-center"
+    >
+        <!-- Spotify Icon -->
+        <div class="flex justify-center mb-4">
+            <i class="ti ti-brand-spotify-filled text-4xl"></i>
+        </div>
+
+        <!-- Content Info -->
+        <div class="mb-4">
+            <p class="text-xs uppercase tracking-wide mb-1">
+                {typeLabels[type]}
+            </p>
+            <h3 class="text-lg font-bold">{title}</h3>
+            {subtitle && <p class="text-sm mt-1">{subtitle}</p>}
+        </div>
+
+        <!-- Consent Notice -->
+        <div class="space-y-3">
+            <p class="text-sm">
+                Um den Spotify-{typeLabels[type]} zu laden, müssen Sie externe Medien
+                erlauben.
+            </p>
+            <p class="text-xs">
+                Spotify kann dabei personenbezogene Daten erheben.
+                <a
+                    href="https://www.spotify.com/de/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="hover:underline"
+                >
+                    Datenschutzerklärung von Spotify
+                </a>
+            </p>
+            <button
+                class="load-spotify-btn px-4 py-2 bg-neutral-700 hover:bg-neutral-600 rounded-lg font-medium text-sm transition-colors duration-200"
+                data-spotify-id={spotifyId}
+                data-spotify-type={type}
+            >
+                Cookie-Einstellungen öffnen
+            </button>
+        </div>
+    </div>
+
+    <!-- Spotify iframe Container (wird nach Consent angezeigt) -->
+    <div
+        class="spotify-iframe-container hidden rounded-xl overflow-hidden"
+        data-height={height}
+    >
+        <!-- Der iframe wird hier dynamisch eingefügt -->
+    </div>
+</div>
+
+<script>
+    // Funktion zum Überprüfen des Cookie-Consents
+    function hasSpotifyConsent() {
+        if (window.CookieManager) {
+            return window.CookieManager.hasMediaConsent();
+        }
+        return false;
+    }
+
+    // Funktion zum Öffnen der Cookie-Einstellungen
+    function openCookieSettings() {
+        const banner = document.getElementById("cookie-consent-banner");
+        const settingsButton = document.getElementById(
+            "cookie-settings-button",
+        );
+        if (banner) {
+            banner.classList.remove("translate-x-full");
+            if (settingsButton) {
+                settingsButton.classList.add("hidden");
+                settingsButton.classList.remove("flex");
+            }
+        }
+    }
+
+    // Funktion zum Laden des Spotify-Players
+    function loadSpotifyPlayer(
+        spotifyId: string,
+        type: string,
+        container: HTMLElement,
+        height: string,
+    ) {
+        const iframe = document.createElement("iframe");
+        iframe.style.borderRadius = "12px";
+        iframe.src = `https://open.spotify.com/embed/${type}/${spotifyId}?utm_source=generator&theme=0`;
+        iframe.width = "100%";
+        iframe.height = height;
+        iframe.allowFullscreen = false;
+        iframe.allow =
+            "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
+        iframe.loading = "lazy";
+        iframe.title = `Spotify ${type}-embed`;
+
+        container.appendChild(iframe);
+    }
+
+    // Event Listener für alle Spotify-Player auf der Seite
+    document.addEventListener("DOMContentLoaded", () => {
+        // Funktion zum Laden aller Spotify-Player
+        function loadAllSpotifyPlayers() {
+            const wrappers = document.querySelectorAll(
+                ".spotify-consent-wrapper",
+            );
+
+            wrappers.forEach((wrapper) => {
+                const spotifyId = wrapper.getAttribute("data-spotify-id");
+                const spotifyType =
+                    wrapper.getAttribute("data-spotify-type") || "track";
+                if (!spotifyId) return;
+
+                const placeholder = wrapper.querySelector(
+                    ".spotify-placeholder",
+                ) as HTMLElement;
+                const iframeContainer = wrapper.querySelector(
+                    ".spotify-iframe-container",
+                ) as HTMLElement;
+                const height =
+                    iframeContainer?.getAttribute("data-height") || "352";
+
+                if (
+                    placeholder &&
+                    iframeContainer &&
+                    !placeholder.classList.contains("hidden")
+                ) {
+                    placeholder.classList.add("hidden");
+                    iframeContainer.classList.remove("hidden");
+                    loadSpotifyPlayer(
+                        spotifyId,
+                        spotifyType,
+                        iframeContainer,
+                        height,
+                    );
+                }
+            });
+        }
+
+        // Überprüfe beim Laden der Seite, ob Consent bereits vorhanden ist
+        if (hasSpotifyConsent()) {
+            loadAllSpotifyPlayers();
+        }
+
+        // Event Listener für die Buttons
+        const buttons = document.querySelectorAll(".load-spotify-btn");
+
+        buttons.forEach((button) => {
+            button.addEventListener("click", (e) => {
+                e.preventDefault();
+                openCookieSettings();
+            });
+        });
+
+        // Lausche auf Cookie-Consent-Updates
+        window.addEventListener("mediaConsentUpdate", (event: any) => {
+            if (event.detail.allowed === true) {
+                loadAllSpotifyPlayers();
+            }
+        });
+    });
+</script>
