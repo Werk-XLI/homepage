@@ -10,7 +10,7 @@ const { privacyPolicyUrl = "/privacy-policy" } = Astro.props;
 <!-- Cookie Consent Banner -->
 <div
     id="cookie-consent-banner"
-    class="fixed bottom-4 right-4 max-w-sm w-full sm:w-96 bg-neutral-800 shadow-2xl border border-neutral-700 rounded-lg p-4 z-50 transform translate-x-full transition-transform duration-300 ease-in-out"
+    class="fixed bottom-4 right-4 max-w-sm w-full sm:w-96 bg-neutral-800 shadow-2xl border border-neutral-700 rounded-lg p-4 z-50 transform translate-x-full transition-all duration-500 ease-out opacity-0 pointer-events-none"
     aria-live="polite"
     aria-label="Cookie-Einstellungen"
 >
@@ -67,256 +67,258 @@ const { privacyPolicyUrl = "/privacy-policy" } = Astro.props;
 <!-- Cookie Settings Button -->
 <button
     id="cookie-settings-button"
-    class="fixed bottom-4 left-4 w-12 h-12 bg-neutral-700 hover:bg-neutral-600 text-white rounded-full shadow-lg hidden items-center justify-center transition-all duration-200 hover:scale-110 z-40"
+    class="fixed bottom-4 left-4 w-12 h-12 bg-neutral-700 hover:bg-neutral-600 text-white rounded-full shadow-lg transition-all duration-500 ease-out transform scale-0 opacity-0 pointer-events-none z-40 hover:scale-110 active:scale-95"
     aria-label="Cookie-Einstellungen öffnen"
 >
-    <i class="ti ti-settings text-2xl"></i>
+    <i class="ti ti-settings text-2xl transition-transform duration-200"></i>
 </button>
 
 <script>
-    // Vereinfachter Cookie-Manager nur für externe Medien
     class CookieManager {
-        private static CONSENT_COOKIE = "media_consent";
-        private static CONSENT_DURATION = 365; // Tage
+        private static readonly CONSENT_COOKIE = "media_consent";
+        private static readonly CONSENT_DURATION = 365;
 
         static hasMediaConsent(): boolean {
             return this.getCookie(this.CONSENT_COOKIE) === "true";
         }
 
-        static setMediaConsent(allowed: boolean) {
-            // Prüfe den aktuellen Zustand vor der Änderung
-            const currentConsent = this.hasMediaConsent();
-            const consentExists = this.getCookie(this.CONSENT_COOKIE) !== null;
+        static setMediaConsent(allowed: boolean): void {
+            const wasAllowed = this.hasMediaConsent();
+            const cookieExists = this.getCookie(this.CONSENT_COOKIE) !== null;
 
             if (allowed) {
-                this.setCookie(
-                    this.CONSENT_COOKIE,
-                    "true",
-                    this.CONSENT_DURATION,
-                );
+                this.setCookie(this.CONSENT_COOKIE, "true", this.CONSENT_DURATION);
             } else {
                 this.deleteCookie(this.CONSENT_COOKIE);
                 this.deleteEmbeddedMediaCookies();
                 
-                // Reload nur wenn Consent von true zu false geändert wird
-                // NICHT bei erstmaliger Ablehnung (wenn noch kein Cookie existierte)
-                if (consentExists && currentConsent === true) {
-                    console.log('Consent wurde von erlaubt zu abgelehnt geändert - Reload wird ausgeführt');
-                    this.forceReloadAfterReject();
-                } else {
-                    console.log('Erstmalige Ablehnung - kein Reload erforderlich');
+                // Reload only when changing from allowed to rejected
+                if (cookieExists && wasAllowed) {
+                    this.forceReload();
+                    return; // Early return to prevent event dispatch
                 }
             }
 
-            // Event für andere Komponenten
-            window.dispatchEvent(
-                new CustomEvent("mediaConsentUpdate", { detail: { allowed } }),
-            );
+            this.dispatchConsentEvent(allowed);
         }
 
-        static forceReloadAfterReject() {
-            console.log('Cookie-Consent widerrufen - Seite wird neu geladen...');
-            
-            // Zeige Loading-Feedback
-            const rejectButton = document.getElementById("reject-media");
+        private static forceReload(): void {
+            const rejectButton = document.getElementById("reject-media") as HTMLButtonElement;
             if (rejectButton) {
                 rejectButton.textContent = "Lädt...";
-                (rejectButton as HTMLButtonElement).disabled = true;
+                rejectButton.disabled = true;
             }
             
-            // Kurze Verzögerung für UI-Feedback
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
+            setTimeout(() => window.location.reload(), 500);
         }
 
-        static deleteEmbeddedMediaCookies() {
-            // Nur Spotify-Tracking-Cookies (nicht Session-Cookies)
-            const spotifyTrackingCookies = [
-                "sp_t", // Tracking
-                "sp_adid", // Advertising ID
-                "sp_ab", // A/B Testing
-                "sp_new_ab", // New A/B Testing
-                // NICHT: sp_dc, sp_key (Session-Cookies)
+        private static deleteEmbeddedMediaCookies(): void {
+            const cookiesToDelete = [
+                // Spotify tracking only
+                "sp_t", "sp_adid", "sp_ab", "sp_new_ab",
+                // YouTube embed only  
+                "VISITOR_INFO1_LIVE", "YSC", "GPS", "PREF"
             ];
 
-            // Nur YouTube-Embed-spezifische Cookies (nicht Google-Account)
-            const youtubeEmbedCookies = [
-                "VISITOR_INFO1_LIVE", // YouTube embed tracking
-                "YSC", // YouTube session für embeds
-                "GPS", // Location (nur für embeds)
-                "PREF", // Preferences für embeds
-                // NICHT: Accounts-Cookies wie SAPISID, HSID, SID, etc.
-            ];
-
-            const embeddedMediaCookies = [
-                ...spotifyTrackingCookies,
-                ...youtubeEmbedCookies,
-            ];
-
-            embeddedMediaCookies.forEach((cookieName) => {
-                this.deleteCookie(cookieName);
-
-                // Für verschiedene Domain-Varianten
-                document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=.${window.location.hostname};`;
+            cookiesToDelete.forEach(name => {
+                this.deleteCookie(name);
+                document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=.${window.location.hostname};`;
             });
 
-            // Lösche nur embed-spezifische localStorage-Einträge
-            this.clearEmbeddedMediaStorage();
-
-            // Entferne geladene iframes
-            this.removeEmbeddedMediaIframes();
+            this.clearEmbeddedStorage();
+            this.removeEmbeddedIframes();
         }
-        static clearEmbeddedMediaStorage() {
-            try {
-                // localStorage: Nur tracking-spezifische Einträge
-                const localStorageKeys = Object.keys(localStorage);
-                localStorageKeys.forEach((key) => {
-                    // Nur spezifische Tracking-Keys, nicht Account-relevante
-                    if (
-                        key.startsWith("sp_t") || // Spotify Tracking
-                        key.startsWith("sp_ab") || // Spotify A/B Testing
-                        key.startsWith("yt-player") || // YouTube Player
-                        key.includes("embed") || // Embed-spezifische
-                        key.includes("tracking")
-                    ) {
-                        // Tracking-spezifische
+
+        private static clearEmbeddedStorage(): void {
+            const storageKeys = [
+                ...Object.keys(localStorage),
+                ...Object.keys(sessionStorage)
+            ];
+
+            const isEmbedKey = (key: string) => 
+                key.startsWith("sp_t") || key.startsWith("sp_ab") || 
+                key.startsWith("yt-player") || key.includes("embed");
+
+            storageKeys.forEach(key => {
+                if (isEmbedKey(key)) {
+                    try {
                         localStorage.removeItem(key);
-                    }
-                });
-
-                // sessionStorage: Nur embed-spezifische
-                const sessionStorageKeys = Object.keys(sessionStorage);
-                sessionStorageKeys.forEach((key) => {
-                    if (
-                        key.startsWith("yt-player") ||
-                        key.includes("embed") ||
-                        key.startsWith("sp_t")
-                    ) {
                         sessionStorage.removeItem(key);
+                    } catch (e) {
+                        console.warn(`Failed to remove storage key: ${key}`, e);
                     }
-                });
-            } catch (e) {
-                console.warn("Storage-Bereinigung fehlgeschlagen:", e);
-            }
+                }
+            });
         }
 
-        static removeEmbeddedMediaIframes() {
-            // Entferne nur iframes von unserer Seite, nicht separate Browser-Tabs
-            const spotifyIframes = document.querySelectorAll('iframe[src*="open.spotify.com/embed"]');
-            spotifyIframes.forEach(iframe => {
-                iframe.remove();
-            });
+        private static removeEmbeddedIframes(): void {
+            // Remove external iframes
+            document.querySelectorAll(
+                'iframe[src*="open.spotify.com/embed"], iframe[src*="youtube.com/embed"], iframe[src*="youtube-nocookie.com/embed"]'
+            ).forEach(iframe => iframe.remove());
 
-            const youtubeEmbedIframes = document.querySelectorAll('iframe[src*="youtube.com/embed"], iframe[src*="youtube-nocookie.com/embed"]');
-            youtubeEmbedIframes.forEach(iframe => {
-                iframe.remove();
-            });
-
-            // Setze Player-UI zurück
-            const spotifyContainers = document.querySelectorAll('.spotify-iframe-container');
-            spotifyContainers.forEach(container => {
+            // Reset Spotify player UI
+            document.querySelectorAll('.spotify-iframe-container').forEach(container => {
                 container.innerHTML = '';
                 container.classList.add('hidden');
             });
 
-            const spotifyPlaceholders = document.querySelectorAll('.spotify-placeholder');
-            spotifyPlaceholders.forEach(placeholder => {
+            document.querySelectorAll('.spotify-placeholder').forEach(placeholder => {
                 placeholder.classList.remove('hidden');
             });
         }
 
+        private static dispatchConsentEvent(allowed: boolean): void {
+            window.dispatchEvent(new CustomEvent("mediaConsentUpdate", { 
+                detail: { allowed } 
+            }));
+        }
+
         static getCookie(name: string): string | null {
-            const cookies = document.cookie.split(";");
-            for (const cookie of cookies) {
-                const [cookieName, cookieValue] = cookie.trim().split("=");
-                if (cookieName === name) {
-                    return cookieValue;
-                }
-            }
-            return null;
+            const match = document.cookie
+                .split(';')
+                .find(cookie => cookie.trim().startsWith(`${name}=`));
+            return match ? match.split('=')[1] : null;
         }
 
-        static setCookie(name: string, value: string, days: number) {
-            const date = new Date();
-            date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/;SameSite=Lax`;
+        private static setCookie(name: string, value: string, days: number): void {
+            const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+            document.cookie = `${name}=${value};expires=${expires};path=/;SameSite=Lax`;
         }
 
-        static deleteCookie(name: string) {
-            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
-            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=${window.location.hostname};`;
-            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=.${window.location.hostname};`;
+        private static deleteCookie(name: string): void {
+            const domains = ['', window.location.hostname, `.${window.location.hostname}`];
+            domains.forEach(domain => {
+                const domainPart = domain ? `;domain=${domain}` : '';
+                document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/${domainPart};`;
+            });
         }
     }
 
-    // Globale Cookie-Funktionen verfügbar machen
+    // Global access
     (window as any).CookieManager = CookieManager;
 
-    // UI-Logik
+    // Enhanced UI Management with smooth transitions
     document.addEventListener("DOMContentLoaded", () => {
-        const banner = document.getElementById("cookie-consent-banner");
-        const settingsButton = document.getElementById("cookie-settings-button");
-        const closeButton = document.getElementById("close-banner");
+        const elements = {
+            banner: document.getElementById("cookie-consent-banner"),
+            settingsButton: document.getElementById("cookie-settings-button"),
+            closeButton: document.getElementById("close-banner"),
+            acceptButton: document.getElementById("accept-media"),
+            rejectButton: document.getElementById("reject-media")
+        };
 
-        // Prüfe ob bereits Consent vorhanden
-        if (!CookieManager.hasMediaConsent()) {
-            // Zeige Banner beim ersten Besuch oder wenn noch keine Entscheidung getroffen wurde
+        // Enhanced transition functions
+        const showBanner = () => {
+            if (!elements.banner) return;
+            
+            // Enable interactions and start transition
+            elements.banner.classList.remove("pointer-events-none");
+            elements.banner.style.display = 'block';
+            
+            // Force reflow before starting transition
+            elements.banner.offsetHeight;
+            
+            // Animate in
+            elements.banner.classList.remove("translate-x-full", "opacity-0");
+            elements.banner.classList.add("translate-x-0", "opacity-100");
+        };
+
+        const hideBanner = () => {
+            if (!elements.banner) return;
+            
+            // Start exit animation
+            elements.banner.classList.remove("translate-x-0", "opacity-100");
+            elements.banner.classList.add("translate-x-full", "opacity-0");
+            
+            // Disable interactions after animation starts
             setTimeout(() => {
-                banner?.classList.remove("translate-x-full");
-            }, 1000);
+                elements.banner?.classList.add("pointer-events-none");
+            }, 100);
+        };
+        
+        const showSettingsButton = () => {
+            if (!elements.settingsButton) return;
+            
+            // Enable interactions
+            elements.settingsButton.classList.remove("pointer-events-none");
+            
+            // Force reflow
+            elements.settingsButton.offsetHeight;
+            
+            // Animate in with bounce effect
+            elements.settingsButton.classList.remove("scale-0", "opacity-0");
+            elements.settingsButton.classList.add("scale-100", "opacity-100");
+        };
+        
+        const hideSettingsButton = () => {
+            if (!elements.settingsButton) return;
+            
+            // Start exit animation
+            elements.settingsButton.classList.remove("scale-100", "opacity-100");
+            elements.settingsButton.classList.add("scale-0", "opacity-0");
+            
+            // Disable interactions after animation
+            setTimeout(() => {
+                elements.settingsButton?.classList.add("pointer-events-none");
+            }, 100);
+        };
+
+        // Enhanced event handlers with transition coordination
+        const handleBannerClose = () => {
+            hideBanner();
+            setTimeout(showSettingsButton, 400); // Wait for banner to fully hide
+        };
+
+        const handleAccept = () => {
+            // Visual feedback
+            if (elements.acceptButton) {
+                elements.acceptButton.innerHTML = "Gespeichert <i class='ti ti-check ml-1'></i>";
+                elements.acceptButton.classList.add("bg-green-600");
+            }
+            
+            CookieManager.setMediaConsent(true);
+            hideBanner();
+            setTimeout(showSettingsButton, 400);
+        };
+
+        const handleReject = () => {
+            const wasAllowed = CookieManager.hasMediaConsent();
+            const cookieExists = CookieManager.getCookie("media_consent") !== null;
+            const willReload = cookieExists && wasAllowed;
+            
+            // Visual feedback
+            if (elements.rejectButton && willReload) {
+                elements.rejectButton.textContent = "Lädt...";
+                (elements.rejectButton as HTMLButtonElement).disabled = true;
+                elements.rejectButton.classList.add("opacity-75");
+            }
+            
+            CookieManager.setMediaConsent(false);
+            hideBanner();
+            
+            // Only show settings button if not reloading
+            if (!willReload) {
+                setTimeout(showSettingsButton, 400);
+            }
+        };
+
+        const handleSettingsClick = () => {
+            hideSettingsButton();
+            setTimeout(showBanner, 200); // Stagger the animations
+        };
+
+        // Initial state with smooth entrance
+        if (!CookieManager.hasMediaConsent()) {
+            setTimeout(showBanner, 1000);
         } else {
-            // Zeige Settings-Button wenn bereits Consent erteilt
-            settingsButton?.classList.remove("hidden");
-            settingsButton?.classList.add("flex");
+            setTimeout(showSettingsButton, 500); // Delayed entrance for better UX
         }
 
-        // Close banner without decision
-        closeButton?.addEventListener("click", () => {
-            banner?.classList.add("translate-x-full");
-            setTimeout(() => {
-                settingsButton?.classList.remove("hidden");
-                settingsButton?.classList.add("flex");
-            }, 300);
-        });
-
-        // Accept media
-        document
-            .getElementById("accept-media")
-            ?.addEventListener("click", () => {
-                CookieManager.setMediaConsent(true);
-                banner?.classList.add("translate-x-full");
-                setTimeout(() => {
-                    settingsButton?.classList.remove("hidden");
-                    settingsButton?.classList.add("flex");
-                }, 300);
-            });
-
-        // Reject media - mit intelligenter Reload-Logik
-        document
-            .getElementById("reject-media")
-            ?.addEventListener("click", () => {
-                CookieManager.setMediaConsent(false);
-                banner?.classList.add("translate-x-full");
-                
-                // Settings-Button nur anzeigen wenn kein Reload kommt
-                const currentConsent = CookieManager.hasMediaConsent();
-                const consentExists = CookieManager.getCookie("media_consent") !== null;
-                
-                if (!(consentExists && currentConsent === true)) {
-                    // Kein Reload - zeige Settings-Button
-                    setTimeout(() => {
-                        settingsButton?.classList.remove("hidden");
-                        settingsButton?.classList.add("flex");
-                    }, 300);
-                }
-            });
-
-        // Settings button
-        settingsButton?.addEventListener("click", () => {
-            banner?.classList.remove("translate-x-full");
-            settingsButton.classList.add("hidden");
-            settingsButton.classList.remove("flex");
-        });
+        // Event listeners
+        elements.closeButton?.addEventListener("click", handleBannerClose);
+        elements.acceptButton?.addEventListener("click", handleAccept);
+        elements.rejectButton?.addEventListener("click", handleReject);
+        elements.settingsButton?.addEventListener("click", handleSettingsClick);
     });
 </script>
