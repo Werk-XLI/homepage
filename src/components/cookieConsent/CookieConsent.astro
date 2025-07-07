@@ -81,6 +81,10 @@ const { privacyPolicyUrl = "/privacy-policy" } = Astro.props;
         }
 
         static setMediaConsent(allowed: boolean) {
+            // Prüfe den aktuellen Zustand vor der Änderung
+            const currentConsent = this.hasMediaConsent();
+            const consentExists = this.getCookie(this.CONSENT_COOKIE) !== null;
+
             if (allowed) {
                 this.setCookie(
                     this.CONSENT_COOKIE,
@@ -89,12 +93,134 @@ const { privacyPolicyUrl = "/privacy-policy" } = Astro.props;
                 );
             } else {
                 this.deleteCookie(this.CONSENT_COOKIE);
+                this.deleteEmbeddedMediaCookies();
+                
+                // Reload nur wenn Consent von true zu false geändert wird
+                // NICHT bei erstmaliger Ablehnung (wenn noch kein Cookie existierte)
+                if (consentExists && currentConsent === true) {
+                    console.log('Consent wurde von erlaubt zu abgelehnt geändert - Reload wird ausgeführt');
+                    this.forceReloadAfterReject();
+                } else {
+                    console.log('Erstmalige Ablehnung - kein Reload erforderlich');
+                }
             }
 
             // Event für andere Komponenten
             window.dispatchEvent(
                 new CustomEvent("mediaConsentUpdate", { detail: { allowed } }),
             );
+        }
+
+        static forceReloadAfterReject() {
+            console.log('Cookie-Consent widerrufen - Seite wird neu geladen...');
+            
+            // Zeige Loading-Feedback
+            const rejectButton = document.getElementById("reject-media");
+            if (rejectButton) {
+                rejectButton.textContent = "Lädt...";
+                (rejectButton as HTMLButtonElement).disabled = true;
+            }
+            
+            // Kurze Verzögerung für UI-Feedback
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        }
+
+        static deleteEmbeddedMediaCookies() {
+            // Nur Spotify-Tracking-Cookies (nicht Session-Cookies)
+            const spotifyTrackingCookies = [
+                "sp_t", // Tracking
+                "sp_adid", // Advertising ID
+                "sp_ab", // A/B Testing
+                "sp_new_ab", // New A/B Testing
+                // NICHT: sp_dc, sp_key (Session-Cookies)
+            ];
+
+            // Nur YouTube-Embed-spezifische Cookies (nicht Google-Account)
+            const youtubeEmbedCookies = [
+                "VISITOR_INFO1_LIVE", // YouTube embed tracking
+                "YSC", // YouTube session für embeds
+                "GPS", // Location (nur für embeds)
+                "PREF", // Preferences für embeds
+                // NICHT: Accounts-Cookies wie SAPISID, HSID, SID, etc.
+            ];
+
+            const embeddedMediaCookies = [
+                ...spotifyTrackingCookies,
+                ...youtubeEmbedCookies,
+            ];
+
+            embeddedMediaCookies.forEach((cookieName) => {
+                this.deleteCookie(cookieName);
+
+                // Für verschiedene Domain-Varianten
+                document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=.${window.location.hostname};`;
+            });
+
+            // Lösche nur embed-spezifische localStorage-Einträge
+            this.clearEmbeddedMediaStorage();
+
+            // Entferne geladene iframes
+            this.removeEmbeddedMediaIframes();
+        }
+        static clearEmbeddedMediaStorage() {
+            try {
+                // localStorage: Nur tracking-spezifische Einträge
+                const localStorageKeys = Object.keys(localStorage);
+                localStorageKeys.forEach((key) => {
+                    // Nur spezifische Tracking-Keys, nicht Account-relevante
+                    if (
+                        key.startsWith("sp_t") || // Spotify Tracking
+                        key.startsWith("sp_ab") || // Spotify A/B Testing
+                        key.startsWith("yt-player") || // YouTube Player
+                        key.includes("embed") || // Embed-spezifische
+                        key.includes("tracking")
+                    ) {
+                        // Tracking-spezifische
+                        localStorage.removeItem(key);
+                    }
+                });
+
+                // sessionStorage: Nur embed-spezifische
+                const sessionStorageKeys = Object.keys(sessionStorage);
+                sessionStorageKeys.forEach((key) => {
+                    if (
+                        key.startsWith("yt-player") ||
+                        key.includes("embed") ||
+                        key.startsWith("sp_t")
+                    ) {
+                        sessionStorage.removeItem(key);
+                    }
+                });
+            } catch (e) {
+                console.warn("Storage-Bereinigung fehlgeschlagen:", e);
+            }
+        }
+
+        static removeEmbeddedMediaIframes() {
+            // Entferne nur iframes von unserer Seite, nicht separate Browser-Tabs
+            const spotifyIframes = document.querySelectorAll('iframe[src*="open.spotify.com/embed"]');
+            spotifyIframes.forEach(iframe => {
+                iframe.remove();
+            });
+
+            const youtubeEmbedIframes = document.querySelectorAll('iframe[src*="youtube.com/embed"], iframe[src*="youtube-nocookie.com/embed"]');
+            youtubeEmbedIframes.forEach(iframe => {
+                iframe.remove();
+            });
+
+            // Setze Player-UI zurück
+            const spotifyContainers = document.querySelectorAll('.spotify-iframe-container');
+            spotifyContainers.forEach(container => {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+            });
+
+            const spotifyPlaceholders = document.querySelectorAll('.spotify-placeholder');
+            spotifyPlaceholders.forEach(placeholder => {
+                placeholder.classList.remove('hidden');
+            });
         }
 
         static getCookie(name: string): string | null {
@@ -116,6 +242,8 @@ const { privacyPolicyUrl = "/privacy-policy" } = Astro.props;
 
         static deleteCookie(name: string) {
             document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=${window.location.hostname};`;
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=.${window.location.hostname};`;
         }
     }
 
@@ -125,9 +253,7 @@ const { privacyPolicyUrl = "/privacy-policy" } = Astro.props;
     // UI-Logik
     document.addEventListener("DOMContentLoaded", () => {
         const banner = document.getElementById("cookie-consent-banner");
-        const settingsButton = document.getElementById(
-            "cookie-settings-button",
-        );
+        const settingsButton = document.getElementById("cookie-settings-button");
         const closeButton = document.getElementById("close-banner");
 
         // Prüfe ob bereits Consent vorhanden
@@ -163,16 +289,24 @@ const { privacyPolicyUrl = "/privacy-policy" } = Astro.props;
                 }, 300);
             });
 
-        // Reject media
+        // Reject media - mit intelligenter Reload-Logik
         document
             .getElementById("reject-media")
             ?.addEventListener("click", () => {
                 CookieManager.setMediaConsent(false);
                 banner?.classList.add("translate-x-full");
-                setTimeout(() => {
-                    settingsButton?.classList.remove("hidden");
-                    settingsButton?.classList.add("flex");
-                }, 300);
+                
+                // Settings-Button nur anzeigen wenn kein Reload kommt
+                const currentConsent = CookieManager.hasMediaConsent();
+                const consentExists = CookieManager.getCookie("media_consent") !== null;
+                
+                if (!(consentExists && currentConsent === true)) {
+                    // Kein Reload - zeige Settings-Button
+                    setTimeout(() => {
+                        settingsButton?.classList.remove("hidden");
+                        settingsButton?.classList.add("flex");
+                    }, 300);
+                }
             });
 
         // Settings button

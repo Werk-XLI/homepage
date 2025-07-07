@@ -4,6 +4,7 @@ import Base from "../layouts/Base.astro";
 import Banner from "../components/banner/Banner.astro";
 import Pressetext from "../content/markdown/pressetext.md";
 import Live from "../components/live/Live.astro";
+import Player from "../components/music/Player.astro";
 ---
 
 <Base title="Werk XLI">
@@ -15,5 +16,13 @@ import Live from "../components/live/Live.astro";
    </div>
    <div id="live">
       <Live />
+   </div>
+   <div id="music">
+      <Player 
+         spotifyId="6OADyxkS9a03JSoNSvkxEY?si=W7S4tbH6SJmhes2E8BCyig"
+         type="artist"
+         title="Werk XLI"
+         size="normal"
+      />
    </div>
 </Base>
