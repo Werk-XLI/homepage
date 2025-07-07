@@ -7,25 +7,98 @@
     const svg = document.getElementById("logo");
     const logoW = document.getElementById("logo-w");
     const logoText = document.getElementById("logo-text");
-    let last = false;
-    const update = () => {
-      const hide = window.scrollY > 1;
-      if (hide !== last) {
-        logoW.style.display = hide ? "none" : "";
-        if (hide) {
-          const b = logoText.getBBox();
-          svg.setAttribute(
-            "viewBox",
-            `${b.x - 10} ${b.y - 10} ${b.width + 20} ${b.height + 20}`,
-          );
-        } else {
-          svg.setAttribute("viewBox", "0 0 590 370");
-        }
-        last = hide;
+    
+    let isHidden = false;
+    let isTransitioning = false;
+    let animationFrame = null;
+    let logoTextBBox = null;
+    
+    // Cache the bounding box on first calculation
+    const getLogoTextBBox = () => {
+      if (!logoTextBBox) {
+        logoTextBBox = logoText.getBBox();
       }
+      return logoTextBBox;
     };
-    window.addEventListener("scroll", update, { passive: true });
-    update();
+
+    // Smooth transition function
+    const updateLogo = (shouldHide) => {
+      if (isTransitioning || shouldHide === isHidden) return;
+      
+      isTransitioning = true;
+      
+      if (shouldHide) {
+        // Simply hide logoW without transform animation
+        logoW.style.opacity = '0';
+        
+        setTimeout(() => {
+          if (shouldHide === (window.scrollY > 1)) { // Double-check scroll position
+            logoW.style.display = 'none';
+            
+            const b = getLogoTextBBox();
+            svg.setAttribute(
+              "viewBox",
+              `${b.x - 10} ${b.y - 10} ${b.width + 20} ${b.height + 20}`,
+            );
+            
+            isTransitioning = false;
+          } else {
+            isTransitioning = false;
+          }
+        }, 200); // Wait for fade out
+        
+      } else {
+        // Start showing animation
+        svg.setAttribute("viewBox", "0 0 590 370");
+        
+        setTimeout(() => {
+          if (shouldHide === (window.scrollY > 1)) { // Double-check scroll position
+            logoW.style.display = '';
+            logoW.style.opacity = '0';
+            
+            requestAnimationFrame(() => {
+              logoW.style.opacity = '1';
+              isTransitioning = false;
+            });
+          } else {
+            isTransitioning = false;
+          }
+        }, 50); // Small delay for smoother transition
+      }
+      
+      isHidden = shouldHide;
+    };
+
+    // Throttled scroll handler
+    const handleScroll = () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+      
+      animationFrame = requestAnimationFrame(() => {
+        const shouldHide = window.scrollY > 1;
+        updateLogo(shouldHide);
+      });
+    };
+
+    // Add CSS transitions (only for logoW)
+    const addTransitions = () => {
+      logoW.style.transition = 'opacity 0.2s ease';
+    };
+
+    // Initialize
+    addTransitions();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    
+    // Initial state
+    updateLogo(window.scrollY > 1);
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    });
   });
 </script>
 
