@@ -20,6 +20,7 @@ const { privacyPolicyUrl = "/privacy-policy" } = Astro.props;
             <button
                 id="close-banner"
                 class="text-neutral-400 hover:text-neutral-300 ml-2"
+                aria-label="Banner schließen"
             >
                 <i class="ti ti-x text-lg"></i>
             </button>
@@ -42,12 +43,14 @@ const { privacyPolicyUrl = "/privacy-policy" } = Astro.props;
             <button
                 id="accept-media"
                 class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg font-medium text-sm transition-colors duration-200"
+                aria-label="Externe Medien erlauben"
             >
                 Externe Medien erlauben
             </button>
             <button
                 id="reject-media"
                 class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg font-medium text-sm transition-colors duration-200"
+                aria-label="Externe Medien ablehnen"
             >
                 Ablehnen
             </button>
