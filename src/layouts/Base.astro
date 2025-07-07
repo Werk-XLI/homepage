@@ -2,6 +2,7 @@
 import Menu from "../components/menus/Menu.astro";
 import Footer from "../components/footer/DefaultFooter.astro";
 import "../styles/global.css";
+import CookieConsent from "../components/cookieConsent/CookieConsent.astro";
 const { title = "Werk XLI" } = Astro.props;
 ---
 
@@ -30,7 +31,9 @@ const { title = "Werk XLI" } = Astro.props;
     <Menu />
     <main>
       <slot />
+      <CookieConsent privacyPolicyUrl="/privacy-policy" />
     </main>
     <Footer />
   </body>
+  <script defer src="https://umami.werkxli.de/script.js" data-website-id="1611b63a-51da-4069-883e-2d659351ad67"></script>
 </html>

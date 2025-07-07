@@ -1,0 +1,185 @@
+---
+// CookieConsent.astro - Minimalistisches Cookie-Banner nur für Marketing-Cookies
+export interface Props {
+    privacyPolicyUrl?: string;
+}
+
+const { privacyPolicyUrl = "/privacy-policy" } = Astro.props;
+---
+
+<!-- Cookie Consent Banner -->
+<div
+    id="cookie-consent-banner"
+    class="fixed bottom-4 right-4 max-w-sm w-full sm:w-96 bg-neutral-800 shadow-2xl border border-neutral-700 rounded-lg p-4 z-50 transform translate-x-full transition-transform duration-300 ease-in-out"
+    aria-live="polite"
+    aria-label="Cookie-Einstellungen"
+>
+    <div class="space-y-3">
+        <div class="flex items-start justify-between">
+            <h3 class="text-lg font-bold">Cookie-Einstellungen</h3>
+            <button
+                id="close-banner"
+                class="text-neutral-400 hover:text-neutral-300 ml-2"
+            >
+                <i class="ti ti-x text-lg"></i>
+            </button>
+        </div>
+
+        <div class="text-sm space-y-2">
+            <p>
+                Wir verwenden ausschließlich technisch notwendige Cookies für
+                den Betrieb der Website. Externe Medieninhalte (Spotify,
+                YouTube) werden erst nach Ihrer Zustimmung geladen.
+            </p>
+            <p class="text-xs text-neutral-400">
+                Mit einem Klick auf "Externe Medien erlauben" stimmen Sie zu,
+                dass Drittanbieter wie Spotify und YouTube Cookies setzen und
+                Daten über Ihre Nutzung sammeln können.
+            </p>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <button
+                id="accept-media"
+                class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg font-medium text-sm transition-colors duration-200"
+            >
+                Externe Medien erlauben
+            </button>
+            <button
+                id="reject-media"
+                class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg font-medium text-sm transition-colors duration-200"
+            >
+                Ablehnen
+            </button>
+        </div>
+        <a
+            href={privacyPolicyUrl}
+            class="hover:underline text-xs text-neutral-400"
+        >
+            Datenschutzerklärung
+        </a>
+    </div>
+</div>
+
+<!-- Cookie Settings Button -->
+<button
+    id="cookie-settings-button"
+    class="fixed bottom-4 left-4 w-12 h-12 bg-neutral-700 hover:bg-neutral-600 text-white rounded-full shadow-lg hidden items-center justify-center transition-all duration-200 hover:scale-110 z-40"
+    aria-label="Cookie-Einstellungen öffnen"
+>
+    <i class="ti ti-settings text-2xl"></i>
+</button>
+
+<script>
+    // Vereinfachter Cookie-Manager nur für externe Medien
+    class CookieManager {
+        private static CONSENT_COOKIE = "media_consent";
+        private static CONSENT_DURATION = 365; // Tage
+
+        static hasMediaConsent(): boolean {
+            return this.getCookie(this.CONSENT_COOKIE) === "true";
+        }
+
+        static setMediaConsent(allowed: boolean) {
+            if (allowed) {
+                this.setCookie(
+                    this.CONSENT_COOKIE,
+                    "true",
+                    this.CONSENT_DURATION,
+                );
+            } else {
+                this.deleteCookie(this.CONSENT_COOKIE);
+            }
+
+            // Event für andere Komponenten
+            window.dispatchEvent(
+                new CustomEvent("mediaConsentUpdate", { detail: { allowed } }),
+            );
+        }
+
+        static getCookie(name: string): string | null {
+            const cookies = document.cookie.split(";");
+            for (const cookie of cookies) {
+                const [cookieName, cookieValue] = cookie.trim().split("=");
+                if (cookieName === name) {
+                    return cookieValue;
+                }
+            }
+            return null;
+        }
+
+        static setCookie(name: string, value: string, days: number) {
+            const date = new Date();
+            date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/;SameSite=Lax`;
+        }
+
+        static deleteCookie(name: string) {
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+        }
+    }
+
+    // Globale Cookie-Funktionen verfügbar machen
+    (window as any).CookieManager = CookieManager;
+
+    // UI-Logik
+    document.addEventListener("DOMContentLoaded", () => {
+        const banner = document.getElementById("cookie-consent-banner");
+        const settingsButton = document.getElementById(
+            "cookie-settings-button",
+        );
+        const closeButton = document.getElementById("close-banner");
+
+        // Prüfe ob bereits Consent vorhanden
+        if (!CookieManager.hasMediaConsent()) {
+            // Zeige Banner beim ersten Besuch oder wenn noch keine Entscheidung getroffen wurde
+            setTimeout(() => {
+                banner?.classList.remove("translate-x-full");
+            }, 1000);
+        } else {
+            // Zeige Settings-Button wenn bereits Consent erteilt
+            settingsButton?.classList.remove("hidden");
+            settingsButton?.classList.add("flex");
+        }
+
+        // Close banner without decision
+        closeButton?.addEventListener("click", () => {
+            banner?.classList.add("translate-x-full");
+            setTimeout(() => {
+                settingsButton?.classList.remove("hidden");
+                settingsButton?.classList.add("flex");
+            }, 300);
+        });
+
+        // Accept media
+        document
+            .getElementById("accept-media")
+            ?.addEventListener("click", () => {
+                CookieManager.setMediaConsent(true);
+                banner?.classList.add("translate-x-full");
+                setTimeout(() => {
+                    settingsButton?.classList.remove("hidden");
+                    settingsButton?.classList.add("flex");
+                }, 300);
+            });
+
+        // Reject media
+        document
+            .getElementById("reject-media")
+            ?.addEventListener("click", () => {
+                CookieManager.setMediaConsent(false);
+                banner?.classList.add("translate-x-full");
+                setTimeout(() => {
+                    settingsButton?.classList.remove("hidden");
+                    settingsButton?.classList.add("flex");
+                }, 300);
+            });
+
+        // Settings button
+        settingsButton?.addEventListener("click", () => {
+            banner?.classList.remove("translate-x-full");
+            settingsButton.classList.add("hidden");
+            settingsButton.classList.remove("flex");
+        });
+    });
+</script>
