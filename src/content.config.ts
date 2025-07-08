@@ -18,8 +18,21 @@ const defaultCollection = defineCollection({
     date: z.coerce.date().optional()
   }),
 });
+const productsCollection = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    price: z.string(),
+    category: z.enum(["merch", "music", "bundle"]),
+    image: z.string().optional(),
+    available: z.boolean().default(true),
+    featured: z.boolean().default(false)
+  }),
+});
 
 export const collections = {
   liveDates: liveDatesCollection,
-  markdown: defaultCollection
+  markdown: defaultCollection,
+  products: productsCollection
 };

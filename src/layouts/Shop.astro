@@ -1,0 +1,25 @@
+---
+import Base from "./Base.astro";
+const { title = "Shop - Werk XLI" } = Astro.props;
+---
+
+<Base title={title}>
+  <div class="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <!-- Shop Header -->
+    <div class="bg-black text-white py-16">
+      <div class="container mx-auto px-4 text-center">
+        <h1 class="text-4xl md:text-6xl font-black text-shadow-outline mb-4">
+          SHOP
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto">
+          Entdecke unsere Merchandise, Musik und exklusive Bundles
+        </p>
+      </div>
+    </div>
+
+    <!-- Shop Content -->
+    <div class="container mx-auto px-4 py-12">
+      <slot />
+    </div>
+  </div>
+</Base>

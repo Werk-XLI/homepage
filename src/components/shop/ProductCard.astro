@@ -1,0 +1,77 @@
+---
+const { product } = Astro.props;
+const { title, description, price, category, image, available, featured } = product.data;
+const slug = product.slug;
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
+  {featured && (
+    <div class="absolute top-2 left-2 z-10">
+      <span class="bg-red-500 text-white px-2 py-1 text-xs font-bold rounded">
+        FEATURED
+      </span>
+    </div>
+  )}
+  
+  <div class="relative h-64 bg-gray-200 dark:bg-gray-700">
+    {image ? (
+      <img 
+        src={image} 
+        alt={title}
+        class="w-full h-full object-cover"
+        loading="lazy"
+        onerror="this.parentElement.innerHTML='<div class=&quot;w-full h-full flex items-center justify-center text-gray-500&quot;><i class=&quot;ti ti-photo text-4xl&quot;></i></div>'"
+      />
+    ) : (
+      <div class="w-full h-full flex items-center justify-center text-gray-500">
+        <i class="ti ti-photo text-4xl"></i>
+      </div>
+    )}
+    
+    <div class="absolute top-2 right-2">
+      <span class={`px-2 py-1 text-xs font-semibold rounded ${
+        category === 'merch' ? 'bg-blue-500 text-white' :
+        category === 'music' ? 'bg-green-500 text-white' :
+        'bg-purple-500 text-white'
+      }`}>
+        {category === 'merch' ? 'MERCH' : 
+         category === 'music' ? 'MUSIK' : 'BUNDLE'}
+      </span>
+    </div>
+  </div>
+  
+  <div class="p-4">
+    <h3 class="font-bold text-lg mb-2 text-gray-900 dark:text-white">
+      {title}
+    </h3>
+    
+    <p class="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
+      {description}
+    </p>
+    
+    <div class="flex items-center justify-between">
+      <span class="text-xl font-bold text-gray-900 dark:text-white">
+        {price}
+      </span>
+      
+      {available ? (
+        <button class="bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">
+          In den Warenkorb
+        </button>
+      ) : (
+        <span class="text-gray-500 dark:text-gray-400 font-semibold">
+          Ausverkauft
+        </span>
+      )}
+    </div>
+  </div>
+</div>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

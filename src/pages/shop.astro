@@ -1,0 +1,122 @@
+---
+import Shop from "../layouts/Shop.astro";
+import ProductCard from "../components/shop/ProductCard.astro";
+import { getCollection } from "astro:content";
+
+// Get all products
+const allProducts = await getCollection("products");
+const featuredProducts = allProducts.filter(product => product.data.featured);
+const merchProducts = allProducts.filter(product => product.data.category === "merch");
+const musicProducts = allProducts.filter(product => product.data.category === "music");
+const bundleProducts = allProducts.filter(product => product.data.category === "bundle");
+---
+
+<Shop>
+  <!-- Featured Products -->
+  {featuredProducts.length > 0 && (
+    <section class="mb-12">
+      <h2 class="text-3xl font-black text-gray-900 dark:text-white mb-6 text-center">
+        Featured
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {featuredProducts.map((product) => (
+          <ProductCard product={product} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Category Filter Tabs -->
+  <div class="flex flex-wrap justify-center gap-4 mb-8">
+    <button 
+      class="filter-btn active px-6 py-3 rounded-full font-semibold transition-colors bg-black text-white dark:bg-white dark:text-black"
+      data-category="all"
+    >
+      Alle Produkte
+    </button>
+    <button 
+      class="filter-btn px-6 py-3 rounded-full font-semibold transition-colors bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+      data-category="merch"
+    >
+      Merchandise
+    </button>
+    <button 
+      class="filter-btn px-6 py-3 rounded-full font-semibold transition-colors bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+      data-category="music"
+    >
+      Musik
+    </button>
+    <button 
+      class="filter-btn px-6 py-3 rounded-full font-semibold transition-colors bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+      data-category="bundle"
+    >
+      Bundles
+    </button>
+  </div>
+
+  <!-- All Products Grid -->
+  <section class="products-grid">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {allProducts.map((product) => (
+        <div class={`product-item ${product.data.category}`}>
+          <ProductCard product={product} />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Shop Info -->
+  <section class="mt-16 bg-gray-100 dark:bg-gray-800 rounded-lg p-8 text-center">
+    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+      Versand & Zahlungsinfo
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-gray-700 dark:text-gray-300">
+      <div>
+        <i class="ti ti-truck text-2xl mb-2 block"></i>
+        <h4 class="font-semibold mb-1">Kostenloser Versand</h4>
+        <p class="text-sm">Ab 30€ Bestellwert</p>
+      </div>
+      <div>
+        <i class="ti ti-credit-card text-2xl mb-2 block"></i>
+        <h4 class="font-semibold mb-1">Sichere Zahlung</h4>
+        <p class="text-sm">PayPal, Überweisung</p>
+      </div>
+      <div>
+        <i class="ti ti-mail text-2xl mb-2 block"></i>
+        <h4 class="font-semibold mb-1">Fragen?</h4>
+        <p class="text-sm">Schreibt uns an!</p>
+      </div>
+    </div>
+  </section>
+</Shop>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const productItems = document.querySelectorAll('.product-item');
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const category = this.dataset.category;
+        
+        // Update active button
+        filterButtons.forEach(btn => {
+          btn.classList.remove('active', 'bg-black', 'text-white', 'dark:bg-white', 'dark:text-black');
+          btn.classList.add('bg-gray-200', 'text-gray-800', 'dark:bg-gray-700', 'dark:text-white');
+        });
+        
+        this.classList.add('active', 'bg-black', 'text-white', 'dark:bg-white', 'dark:text-black');
+        this.classList.remove('bg-gray-200', 'text-gray-800', 'dark:bg-gray-700', 'dark:text-white');
+        
+        // Filter products
+        productItems.forEach(item => {
+          if (category === 'all' || item.classList.contains(category)) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    });
+  });
+</script>
