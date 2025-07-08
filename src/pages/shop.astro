@@ -1,0 +1,113 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Shop - Werk XLI">
+    <div class="flex items-center flex-col max-w-4xl mx-auto min-h-screen mt-44 px-4">
+        <h1 class="mb-8 text-4xl font-bold text-center">Shop</h1>
+        
+        <!-- Shop Implementation Notice -->
+        <div class="bg-neutral-800 p-6 rounded-lg mb-8 max-w-2xl">
+            <h2 class="text-xl font-bold mb-4">🚧 Shop in Entwicklung</h2>
+            <p class="mb-4">
+                Unser Online-Shop befindet sich derzeit in der Planungsphase. 
+                Wir arbeiten daran, euch bald eine großartige Auswahl an 
+                Werk XLI Merchandise anbieten zu können.
+            </p>
+            <p class="text-sm text-gray-400">
+                Für Anfragen zu Merchandise kontaktiert uns gerne unter: 
+                <a href="mailto:info@werkxli.de" class="text-blue-400 hover:text-blue-300">
+                    info@werkxli.de
+                </a>
+            </p>
+        </div>
+
+        <!-- Planned Products Preview -->
+        <div class="w-full max-w-4xl">
+            <h2 class="text-2xl font-bold mb-6 text-center">Geplante Produkte</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- T-Shirts -->
+                <div class="bg-neutral-800 rounded-lg p-6 text-center">
+                    <div class="bg-neutral-700 h-40 rounded-lg mb-4 flex items-center justify-center">
+                        <i class="ti ti-shirt text-4xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">T-Shirts</h3>
+                    <p class="text-gray-400 text-sm">
+                        Hochwertige T-Shirts mit Werk XLI Logo
+                    </p>
+                </div>
+
+                <!-- Hoodies -->
+                <div class="bg-neutral-800 rounded-lg p-6 text-center">
+                    <div class="bg-neutral-700 h-40 rounded-lg mb-4 flex items-center justify-center">
+                        <i class="ti ti-jacket text-4xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Hoodies</h3>
+                    <p class="text-gray-400 text-sm">
+                        Gemütliche Hoodies für echte Fans
+                    </p>
+                </div>
+
+                <!-- Stickers -->
+                <div class="bg-neutral-800 rounded-lg p-6 text-center">
+                    <div class="bg-neutral-700 h-40 rounded-lg mb-4 flex items-center justify-center">
+                        <i class="ti ti-sticker text-4xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Sticker</h3>
+                    <p class="text-gray-400 text-sm">
+                        Coole Sticker für Laptop, Gitarre & Co.
+                    </p>
+                </div>
+
+                <!-- Music -->
+                <div class="bg-neutral-800 rounded-lg p-6 text-center">
+                    <div class="bg-neutral-700 h-40 rounded-lg mb-4 flex items-center justify-center">
+                        <i class="ti ti-disc text-4xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Musik</h3>
+                    <p class="text-gray-400 text-sm">
+                        Physische Alben und limitierte Editionen
+                    </p>
+                </div>
+
+                <!-- Poster -->
+                <div class="bg-neutral-800 rounded-lg p-6 text-center">
+                    <div class="bg-neutral-700 h-40 rounded-lg mb-4 flex items-center justify-center">
+                        <i class="ti ti-photo text-4xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Poster</h3>
+                    <p class="text-gray-400 text-sm">
+                        Hochwertige Poster und Artwork
+                    </p>
+                </div>
+
+                <!-- Accessories -->
+                <div class="bg-neutral-800 rounded-lg p-6 text-center">
+                    <div class="bg-neutral-700 h-40 rounded-lg mb-4 flex items-center justify-center">
+                        <i class="ti ti-guitar-pick text-4xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Zubehör</h3>
+                    <p class="text-gray-400 text-sm">
+                        Plektren, Pins und weitere Accessoires
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Newsletter Signup -->
+        <div class="bg-neutral-800 p-6 rounded-lg mt-8 max-w-2xl text-center">
+            <h3 class="text-xl font-bold mb-4">Stay tuned!</h3>
+            <p class="mb-4 text-gray-400">
+                Möchtet ihr benachrichtigt werden, sobald unser Shop online geht? 
+                Folgt uns auf unseren Social Media Kanälen oder schreibt uns eine E-Mail.
+            </p>
+            <a 
+                href="/contact" 
+                class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition-colors"
+            >
+                Kontakt aufnehmen
+            </a>
+        </div>
+    </div>
+</Base>
