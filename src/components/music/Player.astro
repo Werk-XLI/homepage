@@ -116,10 +116,17 @@ const typeLabels = {
             "cookie-settings-button",
         );
         if (banner) {
-            banner.classList.remove("translate-x-full");
+            banner.classList.remove("pointer-events-none");
+            banner.style.display = "block";
+            banner.offsetHeight;
+            banner.classList.remove("translate-x-full", "opacity-0");
+            banner.classList.add("translate-x-0", "opacity-100");
             if (settingsButton) {
-                settingsButton.classList.add("hidden");
-                settingsButton.classList.remove("flex");
+                settingsButton.classList.remove("scale-100", "opacity-100");
+                settingsButton.classList.add("scale-0", "opacity-0");
+                setTimeout(() => {
+                    settingsButton.classList.add("pointer-events-none");
+                }, 100);
             }
         }
     }
