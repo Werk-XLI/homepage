@@ -18,14 +18,24 @@ This is the official website for Werk XLI, built with [Astro](https://astro.buil
 
 ```
 /
-├── public/                # Static assets (favicon, images, etc.)
+├── .github/              # GitHub workflows and CI/CD
+├── .vscode/              # VS Code configuration
+├── public/               # Static assets (favicon, fonts, etc.)
 ├── src/
-│   ├── components/        # Reusable UI components (menus, logo, footer)
-│   ├── layouts/           # Page layouts (Base, Shop, etc.)
-│   ├── pages/             # Site pages (index, 404, 500, etc.)
-│   └── styles/            # Global and custom CSS
-├── tailwind.config.js     # Tailwind CSS configuration
-└── package.json           # Project metadata and scripts
+│   ├── components/       # Reusable UI components (menus, logo, footer)
+│   ├── content/          # Content collections and markdown files
+│   ├── images/           # Image assets
+│   ├── layouts/          # Page layouts (Base, Shop, etc.)
+│   ├── pages/            # Site pages (index, 404, 500, etc.)
+│   ├── scripts/          # JavaScript/TypeScript utilities
+│   ├── styles/           # Global and custom CSS
+│   ├── content.config.ts # Content collections configuration
+│   └── env.d.ts          # TypeScript environment definitions
+├── astro.config.mjs      # Astro configuration
+├── Dockerfile            # Docker containerization
+├── package.json          # Project metadata and scripts
+├── tsconfig.json         # TypeScript configuration
+└── vite.config.mjs       # Vite configuration
 ```
 
 ---
@@ -63,7 +73,8 @@ npm run preview
 - **Navigation:** Edit `src/components/menus/FullMenu.astro` and `CurtainMenu.astro`
 - **Footer:** Edit `src/components/footer/DefaultFooter.astro`
 - **Branding:** Update `src/styles/averiaLibre.css` and logo SVG in `src/components/logo/Logo.astro`
-- **Theme:** Customize Tailwind in `tailwind.config.js` and `src/styles/global.css`
+- **Content:** Manage content collections in `src/content/` directory
+- **Theme:** Customize Tailwind in configuration files and `src/styles/global.css`
 
 ---
 
