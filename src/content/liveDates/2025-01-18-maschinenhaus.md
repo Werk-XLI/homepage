@@ -7,7 +7,7 @@ time: "19:00"
 price: "17€"
 ---
 Einfach Berlin. Kommt vorbei unterstützt uns und wir verraten euch dann vielleicht auch was diese Veranstaltung war.
-Auch wenn wir eigentlich nicht darüber reden wollen ABER! spielen einfach in Berlin.
+Auch wenn wir eigentlich nicht darüber reden wollen ABER! wir spielen einfach in Berlin: das ist verrückt.
 
 Auch dabei sind:
 - Magical Fridge
