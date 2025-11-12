@@ -14,3 +14,5 @@ Wir kommen nicht alleine sondern haben natürlich gute Laune und gute Musik mitg
 
 - Andersvoll
 - Schöffisch & Rueß
+
+Tickets findet ihr [hier](https://rausgegangen.de/events/werk-xli-jubilaumskonzert-schofisch-und-ruess-andersvoll-0/)
