@@ -12,5 +12,5 @@ Kommt vorbei und feiert mit uns unser 5-Jähriges Jubiläum in der Bonanzbar.
 
 Wir kommen nicht alleine sondern haben natürlich gute Laune und gute Musik mitgebracht mit:
 
-Andersvoll
-Schöffisch & Rueß
+- Andersvoll
+- Schöffisch & Rueß
