@@ -9,10 +9,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/node": "^9.5.1",
+    "@astrojs/node": "^11.1.6",
     "@tabler/icons-webfont": "^3.33.0",
     "@tailwindcss/vite": "^4.1.7",
-    "astro": "^5.16.6",
+    "astro": "^7.3.3",
     "astro-compress": "^2.3.8",
     "tailwindcss": "^4.1.7"
   }

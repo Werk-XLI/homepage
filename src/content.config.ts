@@ -1,7 +1,8 @@
 import { defineCollection, z } from "astro:content";
+import { glob } from "astro/loaders";
 
 const liveDatesCollection = defineCollection({
-  type: "content",
+  loader: glob({ pattern: "**/*.md", base: "./src/content/liveDates" }),
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
@@ -12,7 +13,7 @@ const liveDatesCollection = defineCollection({
   }),
 });
 const defaultCollection = defineCollection({
-  type: "content",
+  loader: glob({ pattern: "**/*.md", base: "./src/content/markdown" }),
   schema: z.object({
     title: z.string(),
     date: z.coerce.date().optional()
